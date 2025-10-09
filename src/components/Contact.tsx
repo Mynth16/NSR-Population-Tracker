@@ -3,59 +3,57 @@ import { Mail, Phone, MapPin } from "lucide-react";
 const Contact = () => {
   return (
     <div className="min-h-screen bg-gray-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Contact</h1>
+          <h1 className="mb-2 text-4xl font-bold text-gray-900">Contact</h1>
           <p className="text-gray-600">
             Get in touch with Barangay New San Roque
           </p>
         </div>
 
         {/* Contact Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-2xl p-6 border-2 border-gray-300 shadow-sm">
+        <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-3">
+          <div className="p-6 bg-white border-2 border-gray-300 shadow-sm rounded-2xl">
             <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
+              <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-emerald-100">
                 <Mail className="w-8 h-8 text-emerald-600" />
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Email</h3>
-              <p className="text-gray-600">barangay.newsanroque@example.com</p>
+              <h3 className="mb-2 text-lg font-bold text-gray-900">Email</h3>
+              <p className="text-gray-600">lgunewsanroque@gmail.com</p>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 border-2 border-gray-300 shadow-sm">
+          <div className="p-6 bg-white border-2 border-gray-300 shadow-sm rounded-2xl">
             <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
+              <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-emerald-100">
                 <Phone className="w-8 h-8 text-emerald-600" />
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Phone</h3>
+              <h3 className="mb-2 text-lg font-bold text-gray-900">Phone</h3>
               <p className="text-gray-600">(123) 456-7890</p>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 border-2 border-gray-300 shadow-sm">
+          <div className="p-6 bg-white border-2 border-gray-300 shadow-sm rounded-2xl">
             <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
+              <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-emerald-100">
                 <MapPin className="w-8 h-8 text-emerald-600" />
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Address</h3>
-              <p className="text-gray-600">
-                Barangay New San Roque, Philippines
-              </p>
+              <h3 className="mb-2 text-lg font-bold text-gray-900">Address</h3>
+              <p className="text-gray-600">Barangay New San Roque, Pili</p>
             </div>
           </div>
         </div>
 
         {/* Contact Form */}
-        <div className="bg-white rounded-2xl p-8 border-2 border-gray-300 shadow-sm">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        <div className="p-8 bg-white border-2 border-gray-300 shadow-sm rounded-2xl">
+          <h2 className="mb-6 text-2xl font-bold text-gray-900">
             Send us a message
           </h2>
           <form className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block mb-2 text-sm font-medium text-gray-700">
                   Name
                 </label>
                 <input
@@ -65,39 +63,38 @@ const Contact = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block mb-2 text-sm font-medium text-gray-700">
                   Email
                 </label>
                 <input
                   type="email"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  placeholder="your.email@example.com"
+                  placeholder="Your email"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Subject
               </label>
               <input
                 type="text"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                placeholder="What is this about?"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Message
               </label>
               <textarea
                 rows={6}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 placeholder="Your message..."
               />
             </div>
             <button
               type="submit"
-              className="w-full md:w-auto px-8 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium"
+              className="w-full px-8 py-3 font-medium text-white transition-colors rounded-lg md:w-auto bg-emerald-600 hover:bg-emerald-700"
             >
               Send Message
             </button>
