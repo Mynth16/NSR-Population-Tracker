@@ -1,4 +1,4 @@
-import { MapPin, Mail, Facebook } from "lucide-react";
+import { MapPin, Mail} from "lucide-react";
 
 const Footer = () => {
   return (
@@ -7,32 +7,24 @@ const Footer = () => {
         <div className="grid gap-12 mb-12 md:grid-cols-4">
           {/* About */}
           <div className="md:col-span-2">
-            <h3 className="mb-4 text-2xl font-bold text-emerald-400">
-              BNAP 2025
+            <h3 className="mb-4 text-2xl font-bold">
+              Barangay New San Roque
             </h3>
             <p className="mb-6 leading-relaxed text-gray-400">
-              Barangay Nutrition Action Plan for New San Roque, committed to
-              building a well-nourished, healthy, and empowered community
-              through sustainable programs and community participation.
+              A progressive community in Pili, Camarines Sur, committed to 
+              providing quality services and building a better future for all residents 
+              through transparent governance and active community participation.
             </p>
-            <div className="flex space-x-4">
-              <a
-                href="#"
-                className="flex items-center justify-center w-10 h-10 transition-colors rounded-full bg-emerald-600 hover:bg-emerald-500"
-              >
-                <Facebook className="w-5 h-5" />
-              </a>
-            </div>
           </div>
 
           {/* Contact */}
           <div>
-            <h4 className="mb-4 text-lg font-bold text-emerald-400">
+            <h4 className="mb-4 text-lg font-bold">
               Contact Us
             </h4>
             <div className="space-y-3">
               <div className="flex items-start">
-                <MapPin className="flex-shrink-0 w-5 h-5 mt-1 mr-3 text-emerald-400" />
+                <MapPin className="flex-shrink-0 w-5 h-5 mt-1 mr-3 text-gray-400" />
                 <span className="text-sm text-gray-400">
                   Barangay New San Roque
                   <br />
@@ -42,7 +34,7 @@ const Footer = () => {
                 </span>
               </div>
               <div className="flex items-center">
-                <Mail className="w-5 h-5 mr-3 text-emerald-400" />
+                <Mail className="w-5 h-5 mr-3 text-gray-400" />
                 <span className="text-sm text-gray-400">
                   lgunewsanroque@gmail.com
                 </span>
@@ -52,48 +44,40 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="mb-4 text-lg font-bold text-emerald-400">
+            <h4 className="mb-4 text-lg font-bold">
               Quick Links
             </h4>
             <ul className="space-y-2">
               <li>
                 <a
                   href="#home"
-                  className="text-sm text-gray-400 transition-colors hover:text-emerald-400"
+                  className="text-sm text-gray-400 transition-colors hover:text-white"
                 >
                   Home
                 </a>
               </li>
               <li>
                 <a
-                  href="#about"
-                  className="text-sm text-gray-400 transition-colors hover:text-emerald-400"
-                >
-                  About BNAP
-                </a>
-              </li>
-              <li>
-                <a
                   href="#vision"
-                  className="text-sm text-gray-400 transition-colors hover:text-emerald-400"
+                  className="text-sm text-gray-400 transition-colors hover:text-white"
                 >
                   Vision & Mission
                 </a>
               </li>
               <li>
                 <a
-                  href="#programs"
-                  className="text-sm text-gray-400 transition-colors hover:text-emerald-400"
+                  href="#population"
+                  className="text-sm text-gray-400 transition-colors hover:text-white"
                 >
-                  Programs
+                  Population
                 </a>
               </li>
               <li>
                 <a
                   href="#team"
-                  className="text-sm text-gray-400 transition-colors hover:text-emerald-400"
+                  className="text-sm text-gray-400 transition-colors hover:text-white"
                 >
-                  Our Team
+                  Officials & Staff
                 </a>
               </li>
             </ul>

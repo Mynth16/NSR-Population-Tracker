@@ -3,10 +3,7 @@ import { Menu, X, LogIn, LogOut, Users as UsersIcon } from "lucide-react";
 import Hero from "./components/Hero";
 import About from "./components/About";
 import VisionMission from "./components/VisionMission";
-import Statistics from "./components/Statistics";
-import Programs from "./components/Programs";
 import Team from "./components/Team";
-import Timeline from "./components/Timeline";
 import Footer from "./components/Footer";
 import Dashboard from "./components/Dashboard";
 import PopulationTable from "./components/PopulationTable";
@@ -33,7 +30,6 @@ function App() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simple authentication - in production, this would connect to a real backend
     if (loginForm.username === "admin" && loginForm.password === "admin123") {
       setIsAuthenticated(true);
       setShowLoginModal(false);
@@ -50,11 +46,9 @@ function App() {
 
   const navItems = [
     { name: "Home", href: "#home" },
-    { name: "About", href: "#about" },
     { name: "Vision & Mission", href: "#vision" },
-    { name: "Programs", href: "#programs" },
-    { name: "Team", href: "#team" },
-    { name: "Timeline", href: "#timeline" },
+    { name: "Population", href: "#about" },
+    { name: "Staff", href: "#team" },
   ];
 
   const adminNavItems: { name: string; page: AdminPage }[] = [
@@ -63,12 +57,10 @@ function App() {
     { name: "Contact", page: "contact" },
   ];
 
-  // If authenticated, show admin dashboard
   if (isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-100">
-        {/* Admin Navigation */}
-        <nav className="bg-gray-900 text-white shadow-lg">
+        <nav className="text-white bg-gray-900 shadow-lg">
           <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center space-x-3">
@@ -83,7 +75,6 @@ function App() {
                 </div>
               </div>
 
-              {/* Desktop Navigation */}
               <div className="items-center hidden space-x-6 md:flex">
                 {adminNavItems.map((item) => (
                   <button
@@ -107,7 +98,6 @@ function App() {
                 </button>
               </div>
 
-              {/* Mobile menu button */}
               <button
                 className="p-2 md:hidden"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -121,7 +111,6 @@ function App() {
             </div>
           </div>
 
-          {/* Mobile Navigation */}
           {isMenuOpen && (
             <div className="border-t border-gray-700 md:hidden">
               <div className="px-2 pt-2 pb-3 space-y-1">
@@ -158,7 +147,6 @@ function App() {
           )}
         </nav>
 
-        {/* Admin Page Content */}
         {activePage === "dashboard" && (
           <Dashboard totalPopulation={parseInt(population.replace(/,/g, ""))} />
         )}
@@ -168,47 +156,38 @@ function App() {
     );
   }
 
-  // Public website view (when not authenticated)
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation */}
+    <div className="min-h-screen bg-gray-100">
       <nav
         className={`fixed w-full z-50 transition-all duration-300 ${
-          scrolled ? "bg-white shadow-lg" : "bg-transparent"
+          scrolled ? "bg-white shadow-lg" : "bg-white/90 backdrop-blur-sm"
         }`}
       >
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center space-x-3">
-              <div className="text-2xl font-bold text-emerald-600">BNAP</div>
-              <div className="hidden text-sm text-gray-600 md:block">
-                Barangay New San Roque
-              </div>
+              <div className="text-2xl font-bold text-gray-900">Barangay New San Roque</div>
             </div>
 
-            {/* Desktop Navigation */}
             <div className="items-center hidden space-x-8 md:flex">
               {navItems.map((item) => (
                 <a
                   key={item.name}
                   href={item.href}
-                  className={`text-sm font-medium transition-colors hover:text-emerald-600 ${
-                    scrolled ? "text-gray-700" : "text-gray-800"
-                  }`}
+                  className="text-sm font-medium text-gray-700 transition-colors hover:text-gray-900"
                 >
                   {item.name}
                 </a>
               ))}
               <button
                 onClick={() => setShowLoginModal(true)}
-                className="flex items-center px-4 py-2 space-x-2 text-white transition-colors rounded-lg bg-emerald-600 hover:bg-emerald-700"
+                className="flex items-center px-4 py-2 space-x-2 text-white transition-colors bg-gray-900 rounded-lg hover:bg-gray-800"
               >
                 <LogIn className="w-4 h-4" />
                 <span>Admin Login</span>
               </button>
             </div>
 
-            {/* Mobile menu button */}
             <button
               className="p-2 md:hidden"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -222,7 +201,6 @@ function App() {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="bg-white border-t md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1">
@@ -230,7 +208,7 @@ function App() {
                 <a
                   key={item.name}
                   href={item.href}
-                  className="block px-3 py-2 text-base font-medium text-gray-700 rounded-md hover:text-emerald-600 hover:bg-gray-50"
+                  className="block px-3 py-2 text-base font-medium text-gray-700 rounded-md hover:text-gray-900 hover:bg-gray-50"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.name}
@@ -242,7 +220,7 @@ function App() {
                     setShowLoginModal(true);
                     setIsMenuOpen(false);
                   }}
-                  className="flex items-center justify-center w-full px-4 py-2 space-x-2 text-white transition-colors rounded-lg bg-emerald-600 hover:bg-emerald-700"
+                  className="flex items-center justify-center w-full px-4 py-2 space-x-2 text-white transition-colors bg-gray-900 rounded-lg hover:bg-gray-800"
                 >
                   <LogIn className="w-4 h-4" />
                   <span>Admin Login</span>
@@ -253,7 +231,6 @@ function App() {
         )}
       </nav>
 
-      {/* Login Modal */}
       {showLoginModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
           <div className="w-full max-w-md p-8 bg-white shadow-2xl rounded-2xl animate-fade-in-up">
@@ -277,7 +254,7 @@ function App() {
                   onChange={(e) =>
                     setLoginForm({ ...loginForm, username: e.target.value })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                   placeholder="Enter username"
                   required
                 />
@@ -292,14 +269,14 @@ function App() {
                   onChange={(e) =>
                     setLoginForm({ ...loginForm, password: e.target.value })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                   placeholder="Enter password"
                   required
                 />
               </div>
               <button
                 type="submit"
-                className="w-full py-2 font-medium text-white transition-colors rounded-lg bg-emerald-600 hover:bg-emerald-700"
+                className="w-full py-2 font-medium text-white transition-colors bg-gray-900 rounded-lg hover:bg-gray-800"
               >
                 Login
               </button>
@@ -311,18 +288,14 @@ function App() {
         </div>
       )}
 
-      {/* Page Sections */}
       <Hero />
+      <VisionMission />
       <About
         isAuthenticated={isAuthenticated}
         population={population}
         setPopulation={setPopulation}
       />
-      <VisionMission />
-      <Statistics />
-      <Programs />
       <Team />
-      <Timeline />
       <Footer />
     </div>
   );

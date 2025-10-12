@@ -2,53 +2,86 @@ import { ChevronDown } from 'lucide-react';
 
 const Hero = () => {
   return (
-    <section id="home" className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-teal-50">
+    <section id="home" className="relative flex items-center justify-center min-h-screen bg-gray-100">
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 relative z-10">
-        <div className="text-center animate-fade-in-up">
-          <div className="mb-8 flex justify-center space-x-4">
-            <div className="w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center animate-float">
-              <span className="text-3xl">🥗</span>
+      <div className="relative z-10 w-full px-4 py-32 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div className="grid items-center gap-12 md:grid-cols-2">
+          {/* Left Side - Text Content */}
+          <div className="animate-fade-in-left">
+            {/* Logo Space */}
+            <div className="mb-8">
+              <div className="flex items-center justify-center w-32 h-32 overflow-hidden">
+                {/* Logo placeholder - replace with actual logo */}
+                
+                {
+                <img 
+                  src="images/NSRLogo.png" 
+                  alt="Barangay New San Roque Logo"
+                  className="object-contain w-full h-full p-2"
+                />
+                }
+              </div>
+            </div>
+
+
+
+            <h1 className="mb-6 text-5xl font-bold leading-tight text-gray-900 md:text-6xl lg:text-7xl">
+              Barangay
+              <br />
+              <span className="text-gray-700">New San Roque</span>
+            </h1>
+
+
+            <div className="flex flex-col gap-4 sm:flex-row">
+              <a
+                href="#vision"
+                className="inline-flex items-center justify-center px-8 py-4 font-medium text-white transition-all transform bg-gray-900 rounded-lg shadow-lg hover:bg-gray-800 hover:scale-105"
+              >
+                Our Vision
+              </a>
+              <a
+                href="#population"
+                className="inline-flex items-center justify-center px-8 py-4 font-medium text-gray-900 transition-all transform bg-white border-2 border-gray-300 rounded-lg shadow-lg hover:bg-gray-50 hover:scale-105"
+              >
+                View Statistics
+              </a>
             </div>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-            Barangay Nutrition
-            <br />
-            <span className="text-emerald-600">Action Plan 2025</span>
-          </h1>
-
-          <p className="text-xl md:text-2xl text-gray-600 mb-4 max-w-3xl mx-auto">
-            Masustansyang Pagkain, Kaagapay sa Bagong Kinabukasan!
-          </p>
-
-          <p className="text-lg text-gray-500 mb-12 max-w-2xl mx-auto">
-            Barangay New San Roque, Municipality of Pili, Camarines Sur
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <a
-              href="#about"
-              className="px-8 py-4 bg-emerald-600 text-white rounded-full font-medium hover:bg-emerald-700 transition-all transform hover:scale-105 shadow-lg"
-            >
-              Learn More
-            </a>
-            <a
-              href="#programs"
-              className="px-8 py-4 bg-white text-emerald-600 rounded-full font-medium hover:bg-gray-50 transition-all transform hover:scale-105 shadow-lg border-2 border-emerald-600"
-            >
-              View Programs
-            </a>
+          {/* Right Side - Image Placeholder */}
+          <div className="animate-fade-in-right">
+            <div className="relative">
+              <div className="overflow-hidden bg-white border-4 border-gray-300 shadow-xl aspect-square rounded-2xl">
+                {/* Image placeholder - replace with actual image */}
+                <div className="flex items-center justify-center w-full h-full bg-gray-200">
+                  <div className="p-8 text-center">
+                    <div className="mb-4 text-6xl">🏘️</div>
+                    <p className="font-medium text-gray-600">Barangay Image</p>
+                    <p className="mt-2 text-sm text-gray-500">Replace with actual photo</p>
+                  </div>
+                </div>
+                {/* Uncomment and use when you have an image:
+                <img 
+                  src="/path/to/your/image.jpg" 
+                  alt="Barangay New San Roque"
+                  className="object-cover w-full h-full"
+                />
+                */}
+              </div>
+              {/* Decorative elements */}
+              <div className="absolute w-24 h-24 bg-gray-900 -top-4 -right-4 rounded-2xl -z-10"></div>
+              <div className="absolute w-24 h-24 bg-gray-300 -bottom-4 -left-4 rounded-2xl -z-10"></div>
+            </div>
           </div>
         </div>
       </div>
 
       <a
-        href="#about"
-        className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce"
+        href="#vision"
+        className="absolute transform -translate-x-1/2 bottom-10 left-1/2 animate-bounce"
       >
-        <ChevronDown className="w-8 h-8 text-emerald-600" />
+        <ChevronDown className="w-8 h-8 text-gray-900" />
       </a>
     </section>
   );

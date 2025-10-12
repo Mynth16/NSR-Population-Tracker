@@ -1,5 +1,3 @@
-import { User } from "lucide-react";
-
 const Team = () => {
   const leadership = [
     {
@@ -10,19 +8,71 @@ const Team = () => {
     },
     {
       name: "Hon. Jennie A. Azor",
-      position: "Kagawad on Health",
+      position: "Committee on Health",
       pic: "images/Picture2.jpg",
       alt: "Jennie Azor",
     },
     {
       name: "Hon. Maximino B. Eloreta",
-      position: "Kagawad on Agriculture",
+      position: "Committee on Health",
       pic: "images/Picture4.jpg",
       alt: "Maximino Eloreta",
     },
   ];
 
-  const healthTeam = [
+  const staff = [
+    {
+      name: "Hon. Hazel R. Nanale",
+      position: "Committee on Solid Waste Management",
+      pic: "images/Picture10.jpg",
+      alt: "Hazel Nanale",
+    },
+    {
+      name: "Hon. Ariel F. Fernando",
+      position: "Committee on Agriculture",
+      pic: "images/Picture11.jpg",
+      alt: "Ariel Fernando",
+    },
+    {
+      name: "Hon. Edwin D. Portades",
+      position: "Committee on Education / Social Services",
+      pic: "images/Picture12.jpg",
+      alt: "Edwin Portades",
+    },
+    {
+      name: "Hon. Jeru A. Adizas",
+      position: "Committee on Peace and Order / Committee on Infrastructure",
+      pic: "images/Picture13.jpg",
+      alt: "Jeru Adizas",
+    },
+    {
+      name: "Hon. Milagros V. Ballon",
+      position: "Committee on Agriculture and Animals",
+      pic: "images/Picture14.jpg",
+      alt: "Milagros Ballon",
+    },
+    {
+      name: "Hon. Joy A. Bequillo",
+      position: "SK Chairperson / Committee on Youth and Sports",
+      pic: "images/Picture15.jpg",
+      alt: "Joy Bequillo",
+    },
+    {
+      name: "Joy B. Catimbang",
+      position: "Barangay Secretary",
+      pic: "images/Picture16.jpg",
+      alt: "Joy Catimbang",
+    },
+    {
+      name: "Nora A. Penino",
+      position: "Barangay Treasurer",
+      pic: "images/Picture17.jpg",
+      alt: "Nora Penino",
+    },
+    
+  ];
+
+  const health = [
     {
       name: "RN Catherine A. Villaflor",
       position: "Barangay Nurse",
@@ -59,6 +109,30 @@ const Team = () => {
       pic: "images/Picture7.jpg",
       alt: "Normita Samar",
     },
+    {
+      name: "Joy A. Ordiales",
+      position: "Child Development Worker",
+      pic: "images/Picture18.jpg",
+      alt: "Joy Ordiales",
+    },
+    {
+      name: "Marlita N. Lumabe",
+      position: "Child Development Worker",
+      pic: "images/Picture19.jpg",
+      alt: "Marlita Lumabe",
+    },
+    {
+      name: "Jennie O. Talag",
+      position: "Barangay Rehab Worker",
+      pic: "images/Picture20.jpg",
+      alt: "Jennie Talag",
+    },
+    {
+      name: "Rachelle R. Bulalacao",
+      position: "Barangay Rehab Worker",
+      pic: "images/Picture21.jpg",
+      alt: "Rachelle Bulalacao",
+    },
   ];
 
   return (
@@ -66,25 +140,24 @@ const Team = () => {
       <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="mb-16 text-center animate-fade-in-up">
           <h2 className="mb-4 text-4xl font-bold text-gray-900 md:text-5xl">
-            Our Team
+            Barangay Officials & Staff
           </h2>
-          <div className="w-24 h-1 mx-auto mb-8 bg-emerald-600"></div>
+          <div className="w-24 h-1 mx-auto mb-8 bg-gray-900"></div>
           <p className="max-w-3xl mx-auto text-xl text-gray-600">
-            Dedicated leaders and health workers committed to improving
-            nutrition in our community
+            Dedicated leaders and staff serving our community
           </p>
         </div>
 
         {/* Leadership */}
         <div className="mb-16">
           <h3 className="mb-8 text-2xl font-bold text-center text-gray-900">
-            Barangay Nutrition Committee Leadership
+            Barangay Leadership
           </h3>
           <div className="grid gap-8 md:grid-cols-3">
             {leadership.map((member, index) => (
               <div
                 key={index}
-                className="p-8 text-center transition-shadow duration-300 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-3xl hover:shadow-xl animate-fade-in-up"
+                className="p-8 text-center transition-shadow duration-300 bg-white border-2 border-gray-300 shadow-sm rounded-2xl hover:shadow-md animate-fade-in-up"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="flex items-center justify-center w-32 h-32 mx-auto mb-6 overflow-hidden bg-gray-200 rounded-full">
@@ -93,13 +166,11 @@ const Team = () => {
                     alt={member.alt}
                     className="object-cover w-full h-full"
                   />
-                  {/* Replace with actual image: <img src="/path/to/image.jpg" alt={member.name} className="object-cover w-full h-full" /> */}
-                  <User className="w-16 h-16 text-gray-400" />
                 </div>
                 <h4 className="mb-2 text-xl font-bold text-gray-900">
                   {member.name}
                 </h4>
-                <p className="mb-1 font-medium text-emerald-600">
+                <p className="mb-1 font-medium text-gray-700">
                   {member.position}
                 </p>
               </div>
@@ -107,13 +178,43 @@ const Team = () => {
           </div>
         </div>
 
-        {/* Health Team */}
-        <div className="p-8 text-white bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl md:p-12 animate-fade-in-up">
+        {/* Barangay Council */}
+        <div className="mb-16">
+          <h3 className="mb-8 text-2xl font-bold text-center text-gray-900">
+            Barangay Officials & Staff
+          </h3>
+          <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-4">
+            {staff.map((member, index) => (
+              <div
+                key={index}
+                className="p-6 text-center transition-shadow duration-300 bg-white border-2 border-gray-300 shadow-sm rounded-2xl hover:shadow-md animate-fade-in-up"
+                style={{ animationDelay: `${index * 80}ms` }}
+              >
+                <div className="flex items-center justify-center w-24 h-24 mx-auto mb-4 overflow-hidden bg-gray-200 rounded-full">
+                  <img
+                    src={member.pic}
+                    alt={member.alt}
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+                <h4 className="mb-1 text-lg font-bold text-gray-900">
+                  {member.name}
+                </h4>
+                <p className="text-sm font-medium text-gray-700">
+                  {member.position}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Staff Team */}
+        <div className="p-8 text-white bg-gray-900 rounded-2xl md:p-12 animate-fade-in-up">
           <h3 className="mb-8 text-2xl font-bold text-center">
-            Barangay Health & Nutrition Team
+            Barangay Health & Support Staff
           </h3>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {healthTeam.map((member, index) => (
+            {health.map((member, index) => (
               <div
                 key={index}
                 className="p-6 transition-all duration-300 bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl hover:bg-opacity-20"
@@ -126,7 +227,6 @@ const Team = () => {
                       alt={member.alt}
                       className="object-cover w-full h-full"
                     />
-                    <User className="w-8 h-8 text-gray-400" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-white">{member.name}</h4>
@@ -136,41 +236,7 @@ const Team = () => {
               </div>
             ))}
           </div>
-        </div>
-
-        {/* Message Section */}
-        <div className="grid gap-8 mt-16 md:grid-cols-2">
-          <div className="p-8 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-3xl animate-fade-in-left">
-            <div className="mb-4 text-6xl">"</div>
-            <p className="mb-6 text-lg leading-relaxed text-gray-700">
-              We embrace the theme{" "}
-              <strong>
-                "Masustansyang Pagkain, Kaagapay sa Bagong Kinabukasan!"
-              </strong>{" "}
-              because we believe that proper nutrition is not just about food—it
-              is about giving our people the chance to live healthier, more
-              productive, and more hopeful lives.
-            </p>
-            <p className="font-semibold text-emerald-600">
-              - Hon. Yolanda M. Beriña
-            </p>
-            <p className="text-sm text-gray-600">Punong Barangay</p>
-          </div>
-
-          <div className="p-8 bg-gradient-to-br from-teal-50 to-cyan-50 rounded-3xl animate-fade-in-right">
-            <div className="mb-4 text-6xl">"</div>
-            <p className="mb-6 text-lg leading-relaxed text-gray-700">
-              A healthy barangay starts with healthy families, and it is our
-              mission to ensure that every household has access to nutritious
-              food, quality health services, and information that empowers them
-              to make healthy choices.
-            </p>
-            <p className="font-semibold text-teal-600">- Hon. Jennie A. Azor</p>
-            <p className="text-sm text-gray-600">
-              Kagawad on Health and Nutrition
-            </p>
-          </div>
-        </div>
+        </div>  
       </div>
     </section>
   );
