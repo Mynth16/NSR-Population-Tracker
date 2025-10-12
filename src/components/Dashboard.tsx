@@ -75,7 +75,6 @@ const Dashboard = ({ totalPopulation }: DashboardProps) => {
           ))}
         </div>
 
-        {/* Quick Actions and Recent Activity */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Quick Actions */}
           <div className="bg-white rounded-2xl p-6 border-2 border-gray-300 shadow-sm">

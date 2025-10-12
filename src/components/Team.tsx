@@ -178,10 +178,10 @@ const Team = () => {
           </div>
         </div>
 
-        {/* Barangay Council */}
+        {/* Barangay Officials */}
         <div className="mb-16">
           <h3 className="mb-8 text-2xl font-bold text-center text-gray-900">
-            Barangay Officials & Staff
+            Barangay Officials
           </h3>
           <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-4">
             {staff.map((member, index) => (
@@ -208,7 +208,7 @@ const Team = () => {
           </div>
         </div>
 
-        {/* Staff Team */}
+        {/* Health Staff */}
         <div className="p-8 text-white bg-gray-900 rounded-2xl md:p-12 animate-fade-in-up">
           <h3 className="mb-8 text-2xl font-bold text-center">
             Barangay Health & Support Staff

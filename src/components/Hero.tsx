@@ -7,31 +7,22 @@ const Hero = () => {
 
       <div className="relative z-10 w-full px-4 py-32 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="grid items-center gap-12 md:grid-cols-2">
-          {/* Left Side - Text Content */}
           <div className="animate-fade-in-left">
-            {/* Logo Space */}
             <div className="mb-8">
               <div className="flex items-center justify-center w-32 h-32 overflow-hidden">
-                {/* Logo placeholder - replace with actual logo */}
-                
-                {
                 <img 
                   src="images/NSRLogo.png" 
                   alt="Barangay New San Roque Logo"
                   className="object-contain w-full h-full p-2"
                 />
-                }
               </div>
             </div>
-
-
 
             <h1 className="mb-6 text-5xl font-bold leading-tight text-gray-900 md:text-6xl lg:text-7xl">
               Barangay
               <br />
               <span className="text-gray-700">New San Roque</span>
             </h1>
-
 
             <div className="flex flex-col gap-4 sm:flex-row">
               <a
@@ -49,27 +40,15 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* Right Side - Image Placeholder */}
           <div className="animate-fade-in-right">
             <div className="relative">
               <div className="overflow-hidden bg-white border-4 border-gray-300 shadow-xl aspect-square rounded-2xl">
-                {/* Image placeholder - replace with actual image */}
-                <div className="flex items-center justify-center w-full h-full bg-gray-200">
-                  <div className="p-8 text-center">
-                    <div className="mb-4 text-6xl">🏘️</div>
-                    <p className="font-medium text-gray-600">Barangay Image</p>
-                    <p className="mt-2 text-sm text-gray-500">Replace with actual photo</p>
-                  </div>
-                </div>
-                {/* Uncomment and use when you have an image:
                 <img 
-                  src="/path/to/your/image.jpg" 
+                  src="images/main.jpg"
                   alt="Barangay New San Roque"
                   className="object-cover w-full h-full"
                 />
-                */}
               </div>
-              {/* Decorative elements */}
               <div className="absolute w-24 h-24 bg-gray-900 -top-4 -right-4 rounded-2xl -z-10"></div>
               <div className="absolute w-24 h-24 bg-gray-300 -bottom-4 -left-4 rounded-2xl -z-10"></div>
             </div>

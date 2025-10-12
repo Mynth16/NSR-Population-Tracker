@@ -12,7 +12,7 @@ interface Resident {
 const PopulationTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Sample data - in production, this would come from a database
+  // Sample data
   const residents: Resident[] = [
     {
       id: 1,
