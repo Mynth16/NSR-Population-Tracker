@@ -1,1 +1,3 @@
-bnap
+- open terminal
+- bun install
+- bun run dev
