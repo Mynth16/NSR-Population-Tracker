@@ -30,7 +30,7 @@ const Contact = () => {
                 <Phone className="w-8 h-8 text-emerald-600" />
               </div>
               <h3 className="mb-2 text-lg font-bold text-gray-900">Phone</h3>
-              <p className="text-gray-600">(123) 456-7890</p>
+              <p className="text-gray-600">XXX-XXX-XXXX</p>
             </div>
           </div>
 
@@ -53,32 +53,35 @@ const Contact = () => {
           <form className="space-y-6">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
+                <label htmlFor="name-input" className="block mb-2 text-sm font-medium text-gray-700">
                   Name
                 </label>
                 <input
                   type="text"
+                  id="name-input"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   placeholder="Your name"
                 />
               </div>
               <div>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
+                <label htmlFor="email-input" className="block mb-2 text-sm font-medium text-gray-700">
                   Email
                 </label>
                 <input
                   type="email"
+                  id="email-input"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   placeholder="Your email"
                 />
               </div>
             </div>
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700">
+              <label htmlFor="subject-input" className="block mb-2 text-sm font-medium text-gray-700">
                 Subject
               </label>
               <input
                 type="text"
+                id="subject-input"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               />
             </div>

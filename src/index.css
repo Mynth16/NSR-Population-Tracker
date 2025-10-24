@@ -71,34 +71,4 @@
   .animate-float {
     animation: float 3s ease-in-out infinite;
   }
-
-  /* Background Pattern */
-  .bg-grid-pattern {
-    background-image:
-      linear-gradient(to right, #10b98120 1px, transparent 1px),
-      linear-gradient(to bottom, #10b98120 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 10px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-gray-100;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-emerald-500 rounded-full;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-emerald-600;
-}
-
-/* Smooth transitions for all interactive elements */
-button, a {
-  @apply transition-all duration-300;
 }

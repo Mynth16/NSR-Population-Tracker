@@ -47,7 +47,7 @@ function App() {
   const navItems = [
     { name: "Home", href: "#home" },
     { name: "Vision & Mission", href: "#vision" },
-    { name: "Population", href: "#about" },
+    { name: "Population", href: "#population" },
     { name: "Staff", href: "#team" },
   ];
 
@@ -148,7 +148,7 @@ function App() {
         </nav>
 
         {activePage === "dashboard" && (
-          <Dashboard totalPopulation={parseInt(population.replace(/,/g, ""))} />
+          <Dashboard totalPopulation={Number.parseInt(population.replace(/,/g, ""))} />
         )}
         {activePage === "population" && <PopulationTable />}
         {activePage === "contact" && <Contact />}
@@ -245,7 +245,7 @@ function App() {
             </div>
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
+                <label htmlFor="username-input" className="block mb-2 text-sm font-medium text-gray-700">
                   Username
                 </label>
                 <input
@@ -260,7 +260,7 @@ function App() {
                 />
               </div>
               <div>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
+                <label htmlFor="password-input" className="block mb-2 text-sm font-medium text-gray-700">
                   Password
                 </label>
                 <input
