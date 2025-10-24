@@ -1,3 +1,3 @@
-- open terminal
+- git clone
 - bun install
 - bun run dev
