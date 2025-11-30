@@ -1,9 +1,5 @@
 import { useState, useEffect } from "react";
 import { Search, Home } from "lucide-react";
-<<<<<<< HEAD
-=======
-import { createClient } from "@supabase/supabase-js";
->>>>>>> ca6041d1196d37de543c86ff8c5d78631d5147c8
 
 interface Household {
   household_id: string;
@@ -11,18 +7,12 @@ interface Household {
   house_num: string;
   address: string;
   status: string;
-<<<<<<< HEAD
   head_resident_id?: string;
   resident_count?: number;
 }
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-=======
-  resident_count?: number;
-}
-
->>>>>>> ca6041d1196d37de543c86ff8c5d78631d5147c8
 const HouseholdsTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [households, setHouseholds] = useState<Household[]>([]);
@@ -32,7 +22,6 @@ const HouseholdsTable = () => {
   useEffect(() => {
     const fetchHouseholds = async () => {
       try {
-<<<<<<< HEAD
         const response = await fetch(`${API_URL}/api/households?status=active`);
         
         if (!response.ok) {
@@ -44,29 +33,6 @@ const HouseholdsTable = () => {
       } catch (err) {
         console.error("Error fetching households:", err);
         setError("Failed to load households. Make sure the backend server is running.");
-=======
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-        const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-        if (!supabaseUrl || !supabaseKey) {
-          setError("Supabase configuration is missing");
-          setLoading(false);
-          return;
-        }
-
-        const supabase = createClient(supabaseUrl, supabaseKey);
-        const { data, error: fetchError } = await supabase
-          .from("households")
-          .select("*")
-          .eq("status", "active")
-          .order("zone_num", { ascending: true });
-
-        if (fetchError) throw fetchError;
-        setHouseholds(data || []);
-      } catch (err) {
-        console.error("Error fetching households:", err);
-        setError("Failed to load households");
->>>>>>> ca6041d1196d37de543c86ff8c5d78631d5147c8
       } finally {
         setLoading(false);
       }
