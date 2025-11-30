@@ -1,96 +1,60 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, UserPlus } from "lucide-react";
+import { createClient } from "@supabase/supabase-js";
 
 interface Resident {
-  id: number;
-  name: string;
-  age: number;
+  resident_id: string;
+  first_name: string;
+  last_name: string;
+  civil_status: string;
   gender: string;
-  civilStatus: string;
+  birth_date: string;
 }
 
 const PopulationTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [residents, setResidents] = useState<Resident[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Sample data
-  const residents: Resident[] = [
-    {
-      id: 1,
-      name: "Juan Dela Cruz",
-      age: 35,
-      gender: "Male",
-      civilStatus: "Married",
-    },
-    {
-      id: 2,
-      name: "Maria Santos",
-      age: 28,
-      gender: "Female",
-      civilStatus: "Single",
-    },
-    {
-      id: 3,
-      name: "Pedro Reyes",
-      age: 45,
-      gender: "Male",
-      civilStatus: "Married",
-    },
-    {
-      id: 4,
-      name: "Ana Garcia",
-      age: 32,
-      gender: "Female",
-      civilStatus: "Married",
-    },
-    {
-      id: 5,
-      name: "Carlos Mendoza",
-      age: 52,
-      gender: "Male",
-      civilStatus: "Widowed",
-    },
-    {
-      id: 6,
-      name: "Rosa Flores",
-      age: 24,
-      gender: "Female",
-      civilStatus: "Single",
-    },
-    {
-      id: 7,
-      name: "Miguel Torres",
-      age: 41,
-      gender: "Male",
-      civilStatus: "Married",
-    },
-    {
-      id: 8,
-      name: "Elena Ramos",
-      age: 29,
-      gender: "Female",
-      civilStatus: "Single",
-    },
-    {
-      id: 9,
-      name: "Ricardo Cruz",
-      age: 38,
-      gender: "Male",
-      civilStatus: "Married",
-    },
-    {
-      id: 10,
-      name: "Sofia Hernandez",
-      age: 33,
-      gender: "Female",
-      civilStatus: "Married",
-    },
-  ];
+  useEffect(() => {
+    const fetchResidents = async () => {
+      try {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+        if (!supabaseUrl || !supabaseKey) {
+          setError("Supabase configuration is missing");
+          setLoading(false);
+          return;
+        }
+
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        const { data, error: fetchError } = await supabase
+          .from("residents")
+          .select("resident_id, first_name, last_name, civil_status, gender, birth_date")
+          .eq("status", "active");
+
+        if (fetchError) throw fetchError;
+        setResidents(data || []);
+      } catch (err) {
+        console.error("Error fetching residents:", err);
+        setError("Failed to load residents");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchResidents();
+  }, []);
 
   const filteredResidents = residents.filter(
     (resident) =>
-      resident.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      `${resident.first_name} ${resident.last_name}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       resident.gender.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      resident.civilStatus.toLowerCase().includes(searchTerm.toLowerCase())
+      resident.civil_status.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -127,48 +91,64 @@ const PopulationTable = () => {
         {/* Table */}
         <div className="bg-white rounded-2xl border-2 border-gray-300 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b-2 border-gray-300">
-                <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                    Name
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                    Age
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                    Gender
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                    Civil Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {filteredResidents.map((resident) => (
-                  <tr
-                    key={resident.id}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="px-6 py-4 text-sm text-gray-900">
-                      {resident.name}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
-                      {resident.age}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
-                      {resident.gender}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
-                      {resident.civilStatus}
-                    </td>
+            {loading ? (
+              <div className="text-center py-12">
+                <p className="text-gray-500">Loading residents...</p>
+              </div>
+            ) : error ? (
+              <div className="text-center py-12">
+                <p className="text-red-500">{error}</p>
+              </div>
+            ) : (
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b-2 border-gray-300">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                      First Name
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                      Last Name
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                      Civil Status
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                      Gender
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                      Birth Date
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {filteredResidents.map((resident) => (
+                    <tr
+                      key={resident.resident_id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        {resident.first_name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        {resident.last_name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900 capitalize">
+                        {resident.civil_status}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900 capitalize">
+                        {resident.gender}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        {new Date(resident.birth_date).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
 
-          {filteredResidents.length === 0 && (
+          {!loading && !error && filteredResidents.length === 0 && (
             <div className="text-center py-12">
               <p className="text-gray-500">
                 No residents found matching your search.
@@ -178,9 +158,11 @@ const PopulationTable = () => {
         </div>
 
         {/* Results count */}
-        <div className="mt-4 text-sm text-gray-600">
-          Showing {filteredResidents.length} of {residents.length} residents
-        </div>
+        {!loading && !error && (
+          <div className="mt-4 text-sm text-gray-600">
+            Showing {filteredResidents.length} of {residents.length} residents
+          </div>
+        )}
       </div>
     </div>
   );
