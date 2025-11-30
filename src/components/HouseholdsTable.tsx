@@ -1,94 +1,85 @@
 import { useState, useEffect } from "react";
-import { Search, UserPlus } from "lucide-react";
+import { Search, Home } from "lucide-react";
 
-interface Resident {
-  resident_id: string;
-  first_name: string;
-  last_name: string;
-  civil_status: string;
-  gender: string;
-  birth_date: string;
-  educational_attainment?: string;
-  contact_number?: string;
-  email?: string;
+interface Household {
+  household_id: string;
+  zone_num: number;
+  house_num: string;
+  address: string;
+  status: string;
+  head_resident_id?: string;
+  resident_count?: number;
 }
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-const PopulationTable = () => {
+const HouseholdsTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [residents, setResidents] = useState<Resident[]>([]);
+  const [households, setHouseholds] = useState<Household[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchResidents = async () => {
+    const fetchHouseholds = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/residents?status=active`);
+        const response = await fetch(`${API_URL}/api/households?status=active`);
         
         if (!response.ok) {
-          throw new Error('Failed to fetch residents');
+          throw new Error('Failed to fetch households');
         }
         
         const data = await response.json();
-        setResidents(data);
+        setHouseholds(data);
       } catch (err) {
-        console.error("Error fetching residents:", err);
-        setError("Failed to load residents. Make sure the backend server is running.");
+        console.error("Error fetching households:", err);
+        setError("Failed to load households. Make sure the backend server is running.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchResidents();
+    fetchHouseholds();
   }, []);
 
-  const filteredResidents = residents.filter(
-    (resident) =>
-      `${resident.first_name} ${resident.last_name}`
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      resident.gender.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      resident.civil_status.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredHouseholds = households.filter(
+    (household) =>
+      household.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      household.house_num.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      household.zone_num.toString().includes(searchTerm)
   );
 
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Population</h1>
-          <p className="text-gray-600">
-            Manage and view all registered residents
-          </p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Households</h1>
+          <p className="text-gray-600">Manage and view all registered households</p>
         </div>
 
-        {/* Search and Actions */}
         <div className="bg-white rounded-2xl p-6 border-2 border-gray-300 shadow-sm mb-6">
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
             <div className="relative flex-1 w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search residents..."
+                placeholder="Search by address, house number, or zone..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               />
             </div>
             <button className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors">
-              <UserPlus className="w-5 h-5" />
-              <span>Add Resident</span>
+              <Home className="w-5 h-5" />
+              <span>Add Household</span>
             </button>
           </div>
         </div>
 
-        {/* Table */}
         <div className="bg-white rounded-2xl border-2 border-gray-300 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             {loading ? (
               <div className="text-center py-12">
-                <p className="text-gray-500">Loading residents...</p>
+                <p className="text-gray-500">Loading households...</p>
               </div>
             ) : error ? (
               <div className="text-center py-12">
@@ -99,42 +90,39 @@ const PopulationTable = () => {
                 <thead className="bg-gray-50 border-b-2 border-gray-300">
                   <tr>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                      First Name
+                      Zone
                     </th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                      Last Name
+                      House Number
                     </th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                      Civil Status
+                      Address
                     </th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                      Gender
-                    </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                      Birth Date
+                      Status
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {filteredResidents.map((resident) => (
+                  {filteredHouseholds.map((household) => (
                     <tr
-                      key={resident.resident_id}
+                      key={household.household_id}
                       className="hover:bg-gray-50 transition-colors"
                     >
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        {resident.first_name}
+                        Zone {household.zone_num}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        {resident.last_name}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900 capitalize">
-                        {resident.civil_status}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900 capitalize">
-                        {resident.gender}
+                        {household.house_num}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        {new Date(resident.birth_date).toLocaleDateString()}
+                        {household.address}
+                      </td>
+                      <td className="px-6 py-4 text-sm">
+                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                          {household.status.charAt(0).toUpperCase() +
+                            household.status.slice(1)}
+                        </span>
                       </td>
                     </tr>
                   ))}
@@ -143,19 +131,18 @@ const PopulationTable = () => {
             )}
           </div>
 
-          {!loading && !error && filteredResidents.length === 0 && (
+          {!loading && !error && filteredHouseholds.length === 0 && (
             <div className="text-center py-12">
               <p className="text-gray-500">
-                No residents found matching your search.
+                No households found matching your search.
               </p>
             </div>
           )}
         </div>
 
-        {/* Results count */}
         {!loading && !error && (
           <div className="mt-4 text-sm text-gray-600">
-            Showing {filteredResidents.length} of {residents.length} residents
+            Showing {filteredHouseholds.length} of {households.length} households
           </div>
         )}
       </div>
@@ -163,4 +150,4 @@ const PopulationTable = () => {
   );
 };
 
-export default PopulationTable;
+export default HouseholdsTable;

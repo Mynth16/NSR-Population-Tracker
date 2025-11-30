@@ -1,30 +1,69 @@
-import { Users, Baby, Heart } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Users, Baby, Heart, Home } from "lucide-react";
 
 interface DashboardProps {
   totalPopulation: number;
 }
 
+interface PopulationStats {
+  total_population: number;
+  male_count: number;
+  female_count: number;
+  total_households: number;
+  average_age: number;
+}
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 const Dashboard = ({ totalPopulation }: DashboardProps) => {
-  const stats = [
+  const [stats, setStats] = useState<PopulationStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/statistics/population`);
+        if (response.ok) {
+          const data = await response.json();
+          setStats(data);
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  const statCards = [
     {
       title: "Total Population",
-      value: totalPopulation.toString(),
+      value: loading ? "..." : (stats?.total_population || totalPopulation).toString(),
       subtitle: "Current registered residents",
       icon: Users,
       bgColor: "bg-white",
     },
     {
-      title: "Births This Year",
-      value: "100",
-      subtitle: "New births registered",
-      icon: Baby,
+      title: "Total Households",
+      value: loading ? "..." : (stats?.total_households || 0).toString(),
+      subtitle: "Registered households",
+      icon: Home,
       bgColor: "bg-gray-200",
     },
     {
-      title: "Deaths This Year",
-      value: "10",
-      subtitle: "Deaths recorded",
-      icon: Heart,
+      title: "Male Population",
+      value: loading ? "..." : (stats?.male_count || 0).toString(),
+      subtitle: "Male residents",
+      icon: Users,
+      bgColor: "bg-gray-200",
+    },
+    {
+      title: "Female Population",
+      value: loading ? "..." : (stats?.female_count || 0).toString(),
+      subtitle: "Female residents",
+      icon: Users,
       bgColor: "bg-gray-200",
     },
   ];
@@ -55,8 +94,8 @@ const Dashboard = ({ totalPopulation }: DashboardProps) => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {stats.map((stat, index) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {statCards.map((stat, index) => (
             <div
               key={index}
               className={`${stat.bgColor} rounded-2xl p-6 border-2 border-gray-300 shadow-sm`}

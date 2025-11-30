@@ -7,9 +7,10 @@ import Team from "./components/Team";
 import Footer from "./components/Footer";
 import Dashboard from "./components/Dashboard";
 import PopulationTable from "./components/PopulationTable";
+import HouseholdsTable from "./components/HouseholdsTable";
 import Contact from "./components/Contact";
 
-type AdminPage = "dashboard" | "population" | "contact";
+type AdminPage = "dashboard" | "population" | "households" | "contact";
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -54,6 +55,7 @@ function App() {
   const adminNavItems: { name: string; page: AdminPage }[] = [
     { name: "Dashboard", page: "dashboard" },
     { name: "Population", page: "population" },
+    { name: "Households", page: "households" },
     { name: "Contact", page: "contact" },
   ];
 
@@ -151,6 +153,7 @@ function App() {
           <Dashboard totalPopulation={Number.parseInt(population.replace(/,/g, ""))} />
         )}
         {activePage === "population" && <PopulationTable />}
+        {activePage === "households" && <HouseholdsTable />}
         {activePage === "contact" && <Contact />}
       </div>
     );
