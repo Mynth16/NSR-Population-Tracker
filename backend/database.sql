@@ -24,7 +24,6 @@ CREATE TABLE IF NOT EXISTS residents (
   first_name VARCHAR(100) NOT NULL,
   last_name VARCHAR(100) NOT NULL,
   birth_date DATE NOT NULL,
-  age INT GENERATED ALWAYS AS (YEAR(CURDATE()) - YEAR(birth_date)) VIRTUAL,
   gender ENUM('male', 'female') NOT NULL,
   civil_status ENUM('single', 'married', 'widowed', 'separated', 'divorced') NOT NULL,
   educational_attainment VARCHAR(100),
@@ -91,7 +90,7 @@ SELECT
   SUM(CASE WHEN gender = 'male' THEN 1 ELSE 0 END) as male_count,
   SUM(CASE WHEN gender = 'female' THEN 1 ELSE 0 END) as female_count,
   COUNT(DISTINCT household_id) as total_households,
-  AVG(age) as average_age
+  AVG(TIMESTAMPDIFF(YEAR, birth_date, CURDATE())) as average_age
 FROM residents
 WHERE status = 'active';
 

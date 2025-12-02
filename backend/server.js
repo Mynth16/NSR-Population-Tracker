@@ -12,6 +12,39 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+// ==================== AUDIT TRAIL HELPER ====================
+
+// Helper function to log audit trail entries (fails silently)
+async function logAudit(record_type, record_id, details, change_type, acc_id) {
+  try {
+    await db.query(
+      'INSERT INTO audit_trail (record_type, record_id, details, change_type, acc_id) VALUES (?, ?, ?, ?, ?)',
+      [record_type, String(record_id), details, change_type, acc_id || null]
+    );
+  } catch (error) {
+    console.error('Audit trail logging failed:', error);
+    // Fail silently - don't throw error
+  }
+}
+
+// Helper to get user ID from request headers
+function getUserId(req) {
+  return req.headers['x-user-id'] || null;
+}
+
+// Helper to format changes for audit details
+function formatChanges(oldData, newData, fields) {
+  const changes = [];
+  for (const field of fields) {
+    const oldVal = oldData[field];
+    const newVal = newData[field];
+    if (oldVal !== newVal && (oldVal !== undefined || newVal !== undefined)) {
+      changes.push(`${field}: "${oldVal || ''}" → "${newVal || ''}"`);
+    }
+  }
+  return changes.join(', ');
+}
+
 // ==================== RESIDENTS ROUTES ====================
 
 // Get all residents (with optional filters)
@@ -111,6 +144,15 @@ app.post('/api/residents', async (req, res) => {
       [result.insertId]
     );
     
+    // Log audit trail
+    await logAudit(
+      'resident',
+      result.insertId,
+      `Created resident: ${first_name} ${last_name} | Gender: ${gender} | Civil Status: ${civil_status} | Household ID: ${household_id || 'None'}`,
+      'create',
+      getUserId(req)
+    );
+    
     res.status(201).json(newResident[0]);
   } catch (error) {
     console.error('Error creating resident:', error);
@@ -133,6 +175,9 @@ app.put('/api/residents/:id', async (req, res) => {
       email,
       status
     } = req.body;
+    
+    // Get old data for audit trail
+    const [oldData] = await db.query('SELECT * FROM residents WHERE resident_id = ?', [req.params.id]);
     
     await db.query(
       `UPDATE residents SET
@@ -159,6 +204,22 @@ app.put('/api/residents/:id', async (req, res) => {
       [req.params.id]
     );
     
+    // Log audit trail with changes
+    if (oldData.length > 0) {
+      const changes = formatChanges(
+        oldData[0],
+        req.body,
+        ['household_id', 'first_name', 'last_name', 'birth_date', 'gender', 'civil_status', 'educational_attainment', 'contact_number', 'email', 'status']
+      );
+      await logAudit(
+        'resident',
+        req.params.id,
+        `Updated resident: ${first_name} ${last_name} | Changes: ${changes || 'No changes'}`,
+        'update',
+        getUserId(req)
+      );
+    }
+    
     res.json(updated[0]);
   } catch (error) {
     console.error('Error updating resident:', error);
@@ -169,10 +230,24 @@ app.put('/api/residents/:id', async (req, res) => {
 // Delete resident (soft delete)
 app.delete('/api/residents/:id', async (req, res) => {
   try {
+    // Get resident info before archiving for audit trail
+    const [residentData] = await db.query('SELECT first_name, last_name FROM residents WHERE resident_id = ?', [req.params.id]);
+    
     await db.query(
       "UPDATE residents SET status = 'archived' WHERE resident_id = ?",
       [req.params.id]
     );
+    
+    // Log audit trail
+    if (residentData.length > 0) {
+      await logAudit(
+        'resident',
+        req.params.id,
+        `Archived resident: ${residentData[0].first_name} ${residentData[0].last_name}`,
+        'delete',
+        getUserId(req)
+      );
+    }
     
     res.json({ message: 'Resident archived successfully' });
   } catch (error) {
@@ -244,7 +319,7 @@ app.get('/api/households/:id', async (req, res) => {
     
     // Get residents in this household
     const [residents] = await db.query(
-      'SELECT * FROM residents WHERE household_id = ? AND status = "active" ORDER BY is_head DESC, birth_date',
+      'SELECT * FROM residents WHERE household_id = ? AND status = "active" ORDER BY birth_date',
       [req.params.id]
     );
     
@@ -273,6 +348,15 @@ app.post('/api/households', async (req, res) => {
       [result.insertId]
     );
     
+    // Log audit trail
+    await logAudit(
+      'household',
+      result.insertId,
+      `Created household: House #${house_num} | Zone: ${zone_num} | Address: ${address}`,
+      'create',
+      getUserId(req)
+    );
+    
     res.status(201).json(newHousehold[0]);
   } catch (error) {
     console.error('Error creating household:', error);
@@ -285,6 +369,9 @@ app.put('/api/households/:id', async (req, res) => {
   try {
     const { zone_num, house_num, address, status, head_resident_id } = req.body;
     
+    // Get old data for audit trail
+    const [oldData] = await db.query('SELECT * FROM households WHERE household_id = ?', [req.params.id]);
+    
     await db.query(
       'UPDATE households SET zone_num = ?, house_num = ?, address = ?, status = ?, head_resident_id = ? WHERE household_id = ?',
       [zone_num, house_num, address, status, head_resident_id, req.params.id]
@@ -294,6 +381,22 @@ app.put('/api/households/:id', async (req, res) => {
       'SELECT * FROM households WHERE household_id = ?',
       [req.params.id]
     );
+    
+    // Log audit trail with changes
+    if (oldData.length > 0) {
+      const changes = formatChanges(
+        oldData[0],
+        req.body,
+        ['zone_num', 'house_num', 'address', 'status', 'head_resident_id']
+      );
+      await logAudit(
+        'household',
+        req.params.id,
+        `Updated household: House #${house_num} | Zone: ${zone_num} | Changes: ${changes || 'No changes'}`,
+        'update',
+        getUserId(req)
+      );
+    }
     
     res.json(updated[0]);
   } catch (error) {
@@ -305,10 +408,24 @@ app.put('/api/households/:id', async (req, res) => {
 // Delete household (soft delete)
 app.delete('/api/households/:id', async (req, res) => {
   try {
+    // Get household info before archiving for audit trail
+    const [householdData] = await db.query('SELECT house_num, zone_num, address FROM households WHERE household_id = ?', [req.params.id]);
+    
     await db.query(
       "UPDATE households SET status = 'archived' WHERE household_id = ?",
       [req.params.id]
     );
+    
+    // Log audit trail
+    if (householdData.length > 0) {
+      await logAudit(
+        'household',
+        req.params.id,
+        `Archived household: House #${householdData[0].house_num} | Zone: ${householdData[0].zone_num} | Address: ${householdData[0].address}`,
+        'delete',
+        getUserId(req)
+      );
+    }
     
     res.json({ message: 'Household archived successfully' });
   } catch (error) {
@@ -347,10 +464,10 @@ app.get('/api/statistics/age-distribution', async (req, res) => {
     const [distribution] = await db.query(`
       SELECT 
         CASE 
-          WHEN age < 18 THEN 'Minor (0-17)'
-          WHEN age BETWEEN 18 AND 30 THEN 'Young Adult (18-30)'
-          WHEN age BETWEEN 31 AND 45 THEN 'Adult (31-45)'
-          WHEN age BETWEEN 46 AND 60 THEN 'Middle-aged (46-60)'
+          WHEN TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) < 18 THEN 'Minor (0-17)'
+          WHEN TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) BETWEEN 18 AND 30 THEN 'Young Adult (18-30)'
+          WHEN TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) BETWEEN 31 AND 45 THEN 'Adult (31-45)'
+          WHEN TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) BETWEEN 46 AND 60 THEN 'Middle-aged (46-60)'
           ELSE 'Senior (60+)'
         END as age_group,
         COUNT(*) as count
@@ -415,6 +532,15 @@ app.post('/api/staff', async (req, res) => {
     
     const [newStaff] = await db.query('SELECT * FROM staff WHERE staff_id = ?', [result.insertId]);
     
+    // Log audit trail
+    await logAudit(
+      'staff',
+      result.insertId,
+      `Created staff member: ${first_name} ${last_name} | Title: ${title}`,
+      'create',
+      getUserId(req)
+    );
+    
     res.status(201).json(newStaff[0]);
   } catch (error) {
     console.error('Error creating staff member:', error);
@@ -427,12 +553,31 @@ app.put('/api/staff/:id', async (req, res) => {
   try {
     const { first_name, last_name, title, picture } = req.body;
     
+    // Get old data for audit trail
+    const [oldData] = await db.query('SELECT * FROM staff WHERE staff_id = ?', [req.params.id]);
+    
     await db.query(
       'UPDATE staff SET first_name = ?, last_name = ?, title = ?, picture = ? WHERE staff_id = ?',
       [first_name, last_name, title, picture, req.params.id]
     );
     
     const [updated] = await db.query('SELECT * FROM staff WHERE staff_id = ?', [req.params.id]);
+    
+    // Log audit trail with changes
+    if (oldData.length > 0) {
+      const changes = formatChanges(
+        oldData[0],
+        req.body,
+        ['first_name', 'last_name', 'title', 'picture']
+      );
+      await logAudit(
+        'staff',
+        req.params.id,
+        `Updated staff member: ${first_name} ${last_name} | Changes: ${changes || 'No changes'}`,
+        'update',
+        getUserId(req)
+      );
+    }
     
     res.json(updated[0]);
   } catch (error) {
@@ -444,7 +589,22 @@ app.put('/api/staff/:id', async (req, res) => {
 // Delete staff member
 app.delete('/api/staff/:id', async (req, res) => {
   try {
+    // Get staff info before deleting for audit trail
+    const [staffData] = await db.query('SELECT first_name, last_name, title FROM staff WHERE staff_id = ?', [req.params.id]);
+    
     await db.query('DELETE FROM staff WHERE staff_id = ?', [req.params.id]);
+    
+    // Log audit trail
+    if (staffData.length > 0) {
+      await logAudit(
+        'staff',
+        req.params.id,
+        `Deleted staff member: ${staffData[0].first_name} ${staffData[0].last_name} | Title: ${staffData[0].title}`,
+        'delete',
+        getUserId(req)
+      );
+    }
+    
     res.json({ message: 'Staff member deleted successfully' });
   } catch (error) {
     console.error('Error deleting staff member:', error);
@@ -500,6 +660,15 @@ app.post('/api/accounts', async (req, res) => {
       [result.insertId]
     );
     
+    // Log audit trail
+    await logAudit(
+      'account',
+      result.insertId,
+      `Created account: ${username} | Role: ${role || 'viewer'}`,
+      'create',
+      getUserId(req)
+    );
+    
     res.status(201).json(newAccount[0]);
   } catch (error) {
     console.error('Error creating account:', error);
@@ -511,6 +680,9 @@ app.post('/api/accounts', async (req, res) => {
 app.put('/api/accounts/:id', async (req, res) => {
   try {
     const { username, password, role } = req.body;
+    
+    // Get old data for audit trail
+    const [oldData] = await db.query('SELECT username, role FROM account WHERE acc_id = ?', [req.params.id]);
     
     let query = 'UPDATE account SET username = ?, role = ?';
     let params = [username, role];
@@ -531,6 +703,22 @@ app.put('/api/accounts/:id', async (req, res) => {
       [req.params.id]
     );
     
+    // Log audit trail with changes
+    if (oldData.length > 0) {
+      const changes = [];
+      if (oldData[0].username !== username) changes.push(`username: "${oldData[0].username}" → "${username}"`);
+      if (oldData[0].role !== role) changes.push(`role: "${oldData[0].role}" → "${role}"`);
+      if (password) changes.push('password: [changed]');
+      
+      await logAudit(
+        'account',
+        req.params.id,
+        `Updated account: ${username} | Changes: ${changes.join(', ') || 'No changes'}`,
+        'update',
+        getUserId(req)
+      );
+    }
+    
     res.json(updated[0]);
   } catch (error) {
     console.error('Error updating account:', error);
@@ -541,7 +729,22 @@ app.put('/api/accounts/:id', async (req, res) => {
 // Delete account
 app.delete('/api/accounts/:id', async (req, res) => {
   try {
+    // Get account info before deleting for audit trail
+    const [accountData] = await db.query('SELECT username, role FROM account WHERE acc_id = ?', [req.params.id]);
+    
     await db.query('DELETE FROM account WHERE acc_id = ?', [req.params.id]);
+    
+    // Log audit trail
+    if (accountData.length > 0) {
+      await logAudit(
+        'account',
+        req.params.id,
+        `Deleted account: ${accountData[0].username} | Role: ${accountData[0].role}`,
+        'delete',
+        getUserId(req)
+      );
+    }
+    
     res.json({ message: 'Account deleted successfully' });
   } catch (error) {
     console.error('Error deleting account:', error);
@@ -554,22 +757,36 @@ app.post('/api/auth/login', async (req, res) => {
   try {
     const { username, password } = req.body;
     
-    // Simple authentication (in production, use bcrypt to compare hashed passwords)
-    if (username === 'admin' && password === 'admin123') {
-      res.json({
-        success: true,
-        user: {
-          acc_id: 'acc001',
-          username: 'admin',
-          role: 'admin'
-        }
-      });
-    } else {
-      res.status(401).json({ success: false, error: 'Invalid credentials' });
+    // Query database for user
+    const [accounts] = await db.query(
+      'SELECT acc_id, username, password, role FROM account WHERE username = ?',
+      [username]
+    );
+    
+    // Check if user exists
+    if (accounts.length === 0) {
+      return res.status(401).json({ success: false, error: 'Invalid username or password' });
     }
+    
+    const account = accounts[0];
+    
+    // Simple password comparison (in production, use bcrypt to compare hashed passwords)
+    if (password !== account.password) {
+      return res.status(401).json({ success: false, error: 'Invalid username or password' });
+    }
+    
+    // Successful login - return user data without password
+    res.json({
+      success: true,
+      user: {
+        acc_id: account.acc_id,
+        username: account.username,
+        role: account.role
+      }
+    });
   } catch (error) {
     console.error('Error during login:', error);
-    res.status(500).json({ error: 'Login failed' });
+    res.status(500).json({ success: false, error: 'Login failed' });
   }
 });
 
