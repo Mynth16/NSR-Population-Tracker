@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS households (
   household_id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
   zone_num INT NOT NULL,
   house_num VARCHAR(50) NOT NULL,
-  address VARCHAR(255) NOT NULL,
   status ENUM('active', 'inactive', 'archived') DEFAULT 'active',
   head_resident_id VARCHAR(36),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -49,10 +48,12 @@ CREATE TABLE IF NOT EXISTS staff (
   first_name VARCHAR(100) NOT NULL,
   last_name VARCHAR(100) NOT NULL,
   title VARCHAR(100) NOT NULL,
+  category ENUM('leadership', 'official', 'health') NOT NULL DEFAULT 'official',
   picture VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_title (title)
+  INDEX idx_title (title),
+  INDEX idx_category (category)
 );
 
 -- Account table
@@ -61,10 +62,13 @@ CREATE TABLE IF NOT EXISTS account (
   username VARCHAR(50) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
   role ENUM('admin', 'staff', 'viewer') NOT NULL DEFAULT 'viewer',
+  staff_id VARCHAR(36),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (staff_id) REFERENCES staff(staff_id) ON DELETE SET NULL,
   INDEX idx_username (username),
-  INDEX idx_role (role)
+  INDEX idx_role (role),
+  INDEX idx_staff (staff_id)
 );
 
 -- Audit trail table
@@ -76,11 +80,17 @@ CREATE TABLE IF NOT EXISTS audit_trail (
   change_type ENUM('create', 'update', 'delete') NOT NULL,
   change_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   acc_id VARCHAR(36),
+  household_id VARCHAR(36),
+  resident_id VARCHAR(36),
   FOREIGN KEY (acc_id) REFERENCES account(acc_id) ON DELETE SET NULL,
+  FOREIGN KEY (household_id) REFERENCES households(household_id) ON DELETE SET NULL,
+  FOREIGN KEY (resident_id) REFERENCES residents(resident_id) ON DELETE SET NULL,
   INDEX idx_record_type (record_type),
   INDEX idx_record_id (record_id),
   INDEX idx_change_date (change_date),
-  INDEX idx_acc (acc_id)
+  INDEX idx_acc (acc_id),
+  INDEX idx_household (household_id),
+  INDEX idx_resident (resident_id)
 );
 
 -- Population statistics view

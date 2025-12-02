@@ -15,11 +15,11 @@ app.use(express.json());
 // ==================== AUDIT TRAIL HELPER ====================
 
 // Helper function to log audit trail entries (fails silently)
-async function logAudit(record_type, record_id, details, change_type, acc_id) {
+async function logAudit(record_type, record_id, details, change_type, acc_id, household_id = null, resident_id = null) {
   try {
     await db.query(
-      'INSERT INTO audit_trail (record_type, record_id, details, change_type, acc_id) VALUES (?, ?, ?, ?, ?)',
-      [record_type, String(record_id), details, change_type, acc_id || null]
+      'INSERT INTO audit_trail (record_type, record_id, details, change_type, acc_id, household_id, resident_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [record_type, String(record_id), details, change_type, acc_id || null, household_id || null, resident_id || null]
     );
   } catch (error) {
     console.error('Audit trail logging failed:', error);
@@ -32,14 +32,23 @@ function getUserId(req) {
   return req.headers['x-user-id'] || null;
 }
 
+// Helper to format a value for audit display
+function formatAuditValue(val) {
+  if (val === null || val === undefined) return '';
+  if (val instanceof Date) {
+    return val.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+  }
+  return String(val);
+}
+
 // Helper to format changes for audit details
 function formatChanges(oldData, newData, fields) {
   const changes = [];
   for (const field of fields) {
-    const oldVal = oldData[field];
-    const newVal = newData[field];
-    if (oldVal !== newVal && (oldVal !== undefined || newVal !== undefined)) {
-      changes.push(`${field}: "${oldVal || ''}" → "${newVal || ''}"`);
+    const oldVal = formatAuditValue(oldData[field]);
+    const newVal = formatAuditValue(newData[field]);
+    if (oldVal !== newVal) {
+      changes.push(`${field}: "${oldVal}" → "${newVal}"`);
     }
   }
   return changes.join(', ');
@@ -56,7 +65,6 @@ app.get('/api/residents', async (req, res) => {
       SELECT 
         r.*,
         h.house_num,
-        h.address as household_address,
         h.zone_num
       FROM residents r
       LEFT JOIN households h ON r.household_id = h.household_id
@@ -94,7 +102,6 @@ app.get('/api/residents/:id', async (req, res) => {
       `SELECT 
         r.*,
         h.house_num,
-        h.address as household_address,
         h.zone_num
       FROM residents r
       LEFT JOIN households h ON r.household_id = h.household_id
@@ -150,7 +157,9 @@ app.post('/api/residents', async (req, res) => {
       result.insertId,
       `Created resident: ${first_name} ${last_name} | Gender: ${gender} | Civil Status: ${civil_status} | Household ID: ${household_id || 'None'}`,
       'create',
-      getUserId(req)
+      getUserId(req),
+      household_id || null,
+      result.insertId
     );
     
     res.status(201).json(newResident[0]);
@@ -216,7 +225,9 @@ app.put('/api/residents/:id', async (req, res) => {
         req.params.id,
         `Updated resident: ${first_name} ${last_name} | Changes: ${changes || 'No changes'}`,
         'update',
-        getUserId(req)
+        getUserId(req),
+        household_id || null,
+        req.params.id
       );
     }
     
@@ -245,7 +256,9 @@ app.delete('/api/residents/:id', async (req, res) => {
         req.params.id,
         `Archived resident: ${residentData[0].first_name} ${residentData[0].last_name}`,
         'delete',
-        getUserId(req)
+        getUserId(req),
+        null,
+        req.params.id
       );
     }
     
@@ -276,12 +289,11 @@ app.get('/api/households', async (req, res) => {
     
     if (search) {
       query += ` AND (
-        h.address LIKE ? OR
         h.house_num LIKE ? OR
         h.zone_num LIKE ?
       )`;
       const searchTerm = `%${search}%`;
-      params.push(searchTerm, searchTerm, searchTerm);
+      params.push(searchTerm, searchTerm);
     }
     
     if (zone) {
@@ -336,11 +348,11 @@ app.get('/api/households/:id', async (req, res) => {
 // Create new household
 app.post('/api/households', async (req, res) => {
   try {
-    const { zone_num, house_num, address, head_resident_id } = req.body;
+    const { zone_num, house_num, head_resident_id } = req.body;
     
     const [result] = await db.query(
-      'INSERT INTO households (zone_num, house_num, address, head_resident_id) VALUES (?, ?, ?, ?)',
-      [zone_num, house_num, address, head_resident_id || null]
+      'INSERT INTO households (zone_num, house_num, head_resident_id) VALUES (?, ?, ?)',
+      [zone_num, house_num, head_resident_id || null]
     );
     
     const [newHousehold] = await db.query(
@@ -352,9 +364,11 @@ app.post('/api/households', async (req, res) => {
     await logAudit(
       'household',
       result.insertId,
-      `Created household: House #${house_num} | Zone: ${zone_num} | Address: ${address}`,
+      `Created household: House #${house_num} | Zone: ${zone_num}`,
       'create',
-      getUserId(req)
+      getUserId(req),
+      result.insertId,
+      null
     );
     
     res.status(201).json(newHousehold[0]);
@@ -367,14 +381,14 @@ app.post('/api/households', async (req, res) => {
 // Update household
 app.put('/api/households/:id', async (req, res) => {
   try {
-    const { zone_num, house_num, address, status, head_resident_id } = req.body;
+    const { zone_num, house_num, status, head_resident_id } = req.body;
     
     // Get old data for audit trail
     const [oldData] = await db.query('SELECT * FROM households WHERE household_id = ?', [req.params.id]);
     
     await db.query(
-      'UPDATE households SET zone_num = ?, house_num = ?, address = ?, status = ?, head_resident_id = ? WHERE household_id = ?',
-      [zone_num, house_num, address, status, head_resident_id, req.params.id]
+      'UPDATE households SET zone_num = ?, house_num = ?, status = ?, head_resident_id = ? WHERE household_id = ?',
+      [zone_num, house_num, status, head_resident_id, req.params.id]
     );
     
     const [updated] = await db.query(
@@ -387,14 +401,16 @@ app.put('/api/households/:id', async (req, res) => {
       const changes = formatChanges(
         oldData[0],
         req.body,
-        ['zone_num', 'house_num', 'address', 'status', 'head_resident_id']
+        ['zone_num', 'house_num', 'status', 'head_resident_id']
       );
       await logAudit(
         'household',
         req.params.id,
         `Updated household: House #${house_num} | Zone: ${zone_num} | Changes: ${changes || 'No changes'}`,
         'update',
-        getUserId(req)
+        getUserId(req),
+        req.params.id,
+        null
       );
     }
     
@@ -409,7 +425,7 @@ app.put('/api/households/:id', async (req, res) => {
 app.delete('/api/households/:id', async (req, res) => {
   try {
     // Get household info before archiving for audit trail
-    const [householdData] = await db.query('SELECT house_num, zone_num, address FROM households WHERE household_id = ?', [req.params.id]);
+    const [householdData] = await db.query('SELECT house_num, zone_num FROM households WHERE household_id = ?', [req.params.id]);
     
     await db.query(
       "UPDATE households SET status = 'archived' WHERE household_id = ?",
@@ -421,9 +437,11 @@ app.delete('/api/households/:id', async (req, res) => {
       await logAudit(
         'household',
         req.params.id,
-        `Archived household: House #${householdData[0].house_num} | Zone: ${householdData[0].zone_num} | Address: ${householdData[0].address}`,
+        `Archived household: House #${householdData[0].house_num} | Zone: ${householdData[0].zone_num}`,
         'delete',
-        getUserId(req)
+        getUserId(req),
+        req.params.id,
+        null
       );
     }
     
@@ -523,11 +541,11 @@ app.get('/api/staff/:id', async (req, res) => {
 // Create new staff member
 app.post('/api/staff', async (req, res) => {
   try {
-    const { first_name, last_name, title, picture } = req.body;
+    const { first_name, last_name, title, category, picture } = req.body;
     
     const [result] = await db.query(
-      'INSERT INTO staff (first_name, last_name, title, picture) VALUES (?, ?, ?, ?)',
-      [first_name, last_name, title, picture || null]
+      'INSERT INTO staff (first_name, last_name, title, category, picture) VALUES (?, ?, ?, ?, ?)',
+      [first_name, last_name, title, category || 'official', picture || null]
     );
     
     const [newStaff] = await db.query('SELECT * FROM staff WHERE staff_id = ?', [result.insertId]);
@@ -551,14 +569,14 @@ app.post('/api/staff', async (req, res) => {
 // Update staff member
 app.put('/api/staff/:id', async (req, res) => {
   try {
-    const { first_name, last_name, title, picture } = req.body;
+    const { first_name, last_name, title, category, picture } = req.body;
     
     // Get old data for audit trail
     const [oldData] = await db.query('SELECT * FROM staff WHERE staff_id = ?', [req.params.id]);
     
     await db.query(
-      'UPDATE staff SET first_name = ?, last_name = ?, title = ?, picture = ? WHERE staff_id = ?',
-      [first_name, last_name, title, picture, req.params.id]
+      'UPDATE staff SET first_name = ?, last_name = ?, title = ?, category = ?, picture = ? WHERE staff_id = ?',
+      [first_name, last_name, title, category, picture, req.params.id]
     );
     
     const [updated] = await db.query('SELECT * FROM staff WHERE staff_id = ?', [req.params.id]);
@@ -568,7 +586,7 @@ app.put('/api/staff/:id', async (req, res) => {
       const changes = formatChanges(
         oldData[0],
         req.body,
-        ['first_name', 'last_name', 'title', 'picture']
+        ['first_name', 'last_name', 'title', 'category', 'picture']
       );
       await logAudit(
         'staff',
@@ -832,11 +850,11 @@ app.get('/api/audit-trail', async (req, res) => {
 // Create audit trail entry
 app.post('/api/audit-trail', async (req, res) => {
   try {
-    const { record_type, record_id, details, change_type, acc_id } = req.body;
+    const { record_type, record_id, details, change_type, acc_id, household_id, resident_id } = req.body;
     
     const [result] = await db.query(
-      'INSERT INTO audit_trail (record_type, record_id, details, change_type, acc_id) VALUES (?, ?, ?, ?, ?)',
-      [record_type, record_id, details, change_type, acc_id || null]
+      'INSERT INTO audit_trail (record_type, record_id, details, change_type, acc_id, household_id, resident_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [record_type, record_id, details, change_type, acc_id || null, household_id || null, resident_id || null]
     );
     
     const [newEntry] = await db.query(

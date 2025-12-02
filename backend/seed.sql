@@ -5,28 +5,49 @@ USE nsr_population_tracker;
 INSERT INTO account (username, password, role) VALUES
 ('admin', 'admin123', 'admin'),
 ('staff1', 'staff123', 'staff');
--- Note: Using plain text passwords for simplicity. In production, use bcrypt to hash passwords.
 
--- Insert staff members (let DB generate UUID)
-INSERT INTO staff (first_name, last_name, title, picture) VALUES
-('Maria', 'Santos', 'Barangay Captain', NULL),
-('Jose', 'Reyes', 'Barangay Secretary', NULL),
-('Ana', 'Cruz', 'Barangay Treasurer', NULL),
-('Carlos', 'Garcia', 'Barangay Councilor', NULL),
-('Rosa', 'Martinez', 'Health Worker', NULL);
+-- Leadership
+INSERT INTO staff (first_name, last_name, title, category, picture) VALUES
+('Hon. Yolanda M.', 'Beriña', 'Punong Barangay', 'leadership', 'images/Picture3.jpg'),
+('Hon. Jennie A.', 'Azor', 'Committee on Health', 'leadership', 'images/Picture2.jpg'),
+('Hon. Maximino B.', 'Eloreta', 'Committee on Health', 'leadership', 'images/Picture4.jpg');
+
+-- Officials
+INSERT INTO staff (first_name, last_name, title, category, picture) VALUES
+('Hon. Hazel R.', 'Nanale', 'Committee on Solid Waste Management', 'official', 'images/Picture10.jpg'),
+('Hon. Ariel F.', 'Fernando', 'Committee on Agriculture', 'official', 'images/Picture11.jpg'),
+('Hon. Edwin D.', 'Portades', 'Committee on Education / Social Services', 'official', 'images/Picture12.jpg'),
+('Hon. Jeru A.', 'Adizas', 'Committee on Peace and Order / Committee on Infrastructure', 'official', 'images/Picture13.jpg'),
+('Hon. Milagros V.', 'Ballon', 'Committee on Agriculture and Animals', 'official', 'images/Picture14.jpg'),
+('Hon. Joy A.', 'Bequillo', 'SK Chairperson / Committee on Youth and Sports', 'official', 'images/Picture15.jpg'),
+('Joy B.', 'Catimbang', 'Barangay Secretary', 'official', 'images/Picture16.jpg'),
+('Nora A.', 'Penino', 'Barangay Treasurer', 'official', 'images/Picture17.jpg');
+
+-- Health & Support Staff
+INSERT INTO staff (first_name, last_name, title, category, picture) VALUES
+('RN Catherine A.', 'Villaflor', 'Barangay Nurse', 'health', 'images/blank.jpg'),
+('Jane M.', 'Teoxon', 'Barangay Nutrition Scholar', 'health', 'images/Picture8.jpg'),
+('Mylene M.', 'Jose', 'Barangay Nutrition Scholar', 'health', 'images/Picture9.jpg'),
+('Jocelyn E.', 'Ampongan', 'Barangay Health Worker', 'health', 'images/Picture5.jpg'),
+('Rosemarie B.', 'Pardiñas', 'Barangay Health Worker', 'health', 'images/Picture6.jpg'),
+('Normita G.', 'Samar', 'Barangay Health Worker', 'health', 'images/Picture7.jpg'),
+('Joy A.', 'Ordiales', 'Child Development Worker', 'health', 'images/Picture18.jpg'),
+('Marlita N.', 'Lumabe', 'Child Development Worker', 'health', 'images/Picture19.jpg'),
+('Jennie O.', 'Talag', 'Barangay Rehab Worker', 'health', 'images/Picture20.jpg'),
+('Rachelle R.', 'Bulalacao', 'Barangay Rehab Worker', 'health', 'images/Picture21.jpg');
 
 -- Insert sample households (let DB generate UUID, without head_resident_id initially)
-INSERT INTO households (zone_num, house_num, address, status, head_resident_id) VALUES
-(1, '001-A', 'Purok 1, New San Roque', 'active', NULL),
-(1, '002-B', 'Purok 1, New San Roque', 'active', NULL),
-(2, '001-A', 'Purok 2, New San Roque', 'active', NULL),
-(2, '002-C', 'Purok 2, New San Roque', 'active', NULL),
-(3, '001-D', 'Purok 3, New San Roque', 'active', NULL),
-(3, '002-A', 'Purok 3, New San Roque', 'active', NULL),
-(4, '001-B', 'Purok 4, New San Roque', 'active', NULL),
-(4, '002-E', 'Purok 4, New San Roque', 'active', NULL),
-(5, '001-F', 'Purok 5, New San Roque', 'active', NULL),
-(5, '002-A', 'Purok 5, New San Roque', 'active', NULL);
+INSERT INTO households (zone_num, house_num, status, head_resident_id) VALUES
+(1, '001-A', 'active', NULL),
+(1, '002-B', 'active', NULL),
+(2, '001-A', 'active', NULL),
+(2, '002-C', 'active', NULL),
+(3, '001-D', 'active', NULL),
+(3, '002-A', 'active', NULL),
+(4, '001-B', 'active', NULL),
+(4, '002-E', 'active', NULL),
+(5, '001-F', 'active', NULL),
+(5, '002-A', 'active', NULL);
 
 -- Insert sample residents (let DB generate UUID, reference households by zone_num and house_num)
 -- Household 1 (Zone 1, House 001-A)
@@ -241,4 +262,4 @@ FROM residents r, account a WHERE r.first_name = 'Maria' AND r.last_name = 'Dela
 
 INSERT INTO audit_trail (record_type, record_id, details, change_type, acc_id)
 SELECT 'staff', s.staff_id, 'Staff member added', 'create', a.acc_id
-FROM staff s, account a WHERE s.first_name = 'Maria' AND s.last_name = 'Santos' AND a.username = 'admin';
+FROM staff s, account a WHERE s.first_name = 'Hon. Yolanda M.' AND s.last_name = 'Beriña' AND a.username = 'admin';

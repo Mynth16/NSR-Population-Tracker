@@ -15,7 +15,6 @@ interface Household {
   household_id: string;
   zone_num: number;
   house_num: string;
-  address: string;
   status: string;
   head_resident_id?: string;
   resident_count?: number;
@@ -25,7 +24,6 @@ interface Household {
 interface HouseholdFormData {
   zone_num: number;
   house_num: string;
-  address: string;
   status: string;
   head_resident_id: string;
 }
@@ -47,7 +45,6 @@ const HouseholdsTable = () => {
   const [editFormData, setEditFormData] = useState<HouseholdFormData>({
     zone_num: 1,
     house_num: "",
-    address: "",
     status: "active",
     head_resident_id: "",
   });
@@ -152,7 +149,6 @@ const HouseholdsTable = () => {
     setEditFormData({
       zone_num: household.zone_num,
       house_num: household.house_num,
-      address: household.address,
       status: household.status,
       head_resident_id: household.head_resident_id || "",
     });
@@ -235,7 +231,6 @@ const HouseholdsTable = () => {
 
   const filteredHouseholds = households.filter(
     (household) =>
-      household.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
       household.house_num.toLowerCase().includes(searchTerm.toLowerCase()) ||
       household.zone_num.toString().includes(searchTerm)
   );
@@ -269,7 +264,7 @@ const HouseholdsTable = () => {
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-earth-400" />
               <input
                 type="text"
-                placeholder="Search by address, house number, or zone..."
+                placeholder="Search by house number or zone..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 bg-earth-50 border border-earth-200 rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-transparent transition-all placeholder:text-earth-400"
@@ -457,22 +452,6 @@ const HouseholdsTable = () => {
                     </div>
                   </div>
 
-                  {/* Address */}
-                  <div>
-                    <label className="block mb-2 text-sm font-semibold text-forest-800">
-                      Address <span className="text-mahogany-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="address"
-                      value={editFormData.address}
-                      onChange={handleEditInputChange}
-                      required
-                      className="w-full px-4 py-3 bg-earth-50 border border-earth-200 rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-transparent transition-all placeholder:text-earth-400"
-                      placeholder="Enter address"
-                    />
-                  </div>
-
                   {/* Status and Head Resident */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -556,7 +535,7 @@ const HouseholdsTable = () => {
                 </div>
                 <h3 className="text-xl font-bold text-forest-950 font-display mb-2">Delete Household?</h3>
                 <p className="text-earth-600 mb-6">
-                  Are you sure you want to delete the household at <span className="font-semibold">{selectedHousehold.address}</span>? This action will archive the household and cannot be undone.
+                  Are you sure you want to delete the household <span className="font-semibold">House #{selectedHousehold.house_num} (Zone {selectedHousehold.zone_num})</span>? This action will archive the household and cannot be undone.
                 </p>
                 <div className="flex gap-4 w-full">
                   <button
