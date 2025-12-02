@@ -1,0 +1,152 @@
+// NSR Population Tracker - Prisma Schema
+// Using Prisma ORM without Rust engine (driver adapters)
+
+generator client {
+  provider   = "prisma-client"
+  output     = "../generated/prisma"
+  engineType = "client" // Enable Prisma ORM without Rust
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// Enums
+enum HouseholdStatus {
+  active
+  inactive
+  archived
+}
+
+enum ResidentStatus {
+  active
+  deceased
+  moved
+  archived
+}
+
+enum Gender {
+  male
+  female
+}
+
+enum CivilStatus {
+  single
+  married
+  widowed
+  separated
+  divorced
+}
+
+enum AccountRole {
+  admin
+  staff
+  viewer
+}
+
+enum RecordType {
+  household
+  resident
+  staff
+  account
+}
+
+enum ChangeType {
+  create
+  update
+  delete
+}
+
+// Models
+model Household {
+  householdId    String          @id @default(uuid()) @map("household_id") @db.VarChar(36)
+  zoneNum        Int             @map("zone_num")
+  houseNum       String          @map("house_num") @db.VarChar(50)
+  address        String          @db.VarChar(255)
+  status         HouseholdStatus @default(active)
+  headResidentId String?         @map("head_resident_id") @db.VarChar(36)
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+
+  // Relations
+  headResident Resident?  @relation("HouseholdHead", fields: [headResidentId], references: [residentId], onDelete: SetNull)
+  residents    Resident[] @relation("HouseholdResidents")
+
+  @@index([zoneNum], map: "idx_zone")
+  @@index([status], map: "idx_status")
+  @@index([headResidentId], map: "idx_head")
+  @@map("households")
+}
+
+model Resident {
+  residentId            String         @id @default(uuid()) @map("resident_id") @db.VarChar(36)
+  householdId           String?        @map("household_id") @db.VarChar(36)
+  firstName             String         @map("first_name") @db.VarChar(100)
+  lastName              String         @map("last_name") @db.VarChar(100)
+  birthDate             DateTime       @map("birth_date") @db.Date
+  gender                Gender
+  civilStatus           CivilStatus    @map("civil_status")
+  educationalAttainment String?        @map("educational_attainment") @db.VarChar(100)
+  contactNumber         String?        @map("contact_number") @db.VarChar(20)
+  email                 String?        @db.VarChar(100)
+  status                ResidentStatus @default(active)
+  createdAt             DateTime       @default(now()) @map("created_at")
+  updatedAt             DateTime       @updatedAt @map("updated_at")
+
+  // Relations
+  household       Household?  @relation("HouseholdResidents", fields: [householdId], references: [householdId], onDelete: SetNull)
+  headOfHousehold Household[] @relation("HouseholdHead")
+
+  @@index([householdId], map: "idx_household")
+  @@index([status], map: "idx_resident_status")
+  @@index([lastName], map: "idx_last_name")
+  @@map("residents")
+}
+
+model Staff {
+  staffId   String   @id @default(uuid()) @map("staff_id") @db.VarChar(36)
+  firstName String   @map("first_name") @db.VarChar(100)
+  lastName  String   @map("last_name") @db.VarChar(100)
+  title     String   @db.VarChar(100)
+  picture   String?  @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([title], map: "idx_title")
+  @@map("staff")
+}
+
+model Account {
+  accId     String      @id @default(uuid()) @map("acc_id") @db.VarChar(36)
+  username  String      @unique @db.VarChar(50)
+  password  String      @db.VarChar(255)
+  role      AccountRole @default(viewer)
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  auditTrails AuditTrail[]
+
+  @@index([username], map: "idx_username")
+  @@index([role], map: "idx_role")
+  @@map("account")
+}
+
+model AuditTrail {
+  auditId    Int        @id @default(autoincrement()) @map("audit_id")
+  recordType RecordType @map("record_type")
+  recordId   String     @map("record_id") @db.VarChar(36)
+  details    String?    @db.Text
+  changeType ChangeType @map("change_type")
+  changeDate DateTime   @default(now()) @map("change_date")
+  accId      String?    @map("acc_id") @db.VarChar(36)
+
+  // Relations
+  account Account? @relation(fields: [accId], references: [accId], onDelete: SetNull)
+
+  @@index([recordType], map: "idx_record_type")
+  @@index([recordId], map: "idx_record_id")
+  @@index([changeDate], map: "idx_change_date")
+  @@index([accId], map: "idx_acc")
+  @@map("audit_trail")
+}
