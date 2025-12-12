@@ -1,4 +1,1 @@
-- git clone
-- open terminal
-- bun install
-- bun run dev
+follow the setup guide
