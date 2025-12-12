@@ -1,0 +1,375 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            background: rgba(0, 0, 0, 0.5);
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bred {
+            background-color: #FFD700;
+        }
+        
+        .bblue {
+            background-color: #32CD32;
+        }
+        
+        .bgreen {
+            background-color: #90EE90;
+        }
+        
+        #borrower-input {
+            background-color: #FEF8E8;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: none;
+            max-width: 680px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .inline {
+            display: inline-block
+        }
+        
+        .hide-elem {
+            display: none;
+            color: red;
+        }
+        
+        .hide-button {
+            display: none;
+            background-color: red;
+        }
+        
+        .bluebutton {
+            background-color: #FFD700 !important;
+        }
+        
+        .greenbutton {
+            background-color: #32CD32 !important;
+        }
+        
+        .yellowbutton {
+            background-color: #FFD700 !important;
+        }
+        
+        .hide-div {
+            display: none;
+        }
+        
+        .margin-top-20 {
+            margin-top: 20px !important;
+        }
+        
+        .example200 {
+            background-color: yellow;
+        }
+
+        .example {
+            font-weight: bold;
+            font-size: 2em;
+            color: #2d2d2d;
+            text-shadow: none;
+            letter-spacing: 0;
+            padding: 0;
+            border-radius: 0;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #C4956A;
+            font-size: 0.95em;
+            margin-bottom: 30px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.8em;
+            color: #999;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #666;
+        }
+
+        .form-floating > label {
+            color: #2d2d2d;
+            font-weight: 400;
+            font-size: 0.9em;
+        }
+
+        .form-label {
+            color: #2d2d2d;
+            font-weight: 400;
+            font-size: 0.9em;
+            margin-bottom: 6px;
+        }
+
+        .required-asterisk {
+            color: #dc3545;
+        }
+
+        .form-control, .form-select {
+            border: 1px solid #E8D5C4;
+            border-radius: 8px;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            background-color: #FEF8E8;
+            color: #2d2d2d;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #C4956A;
+            box-shadow: none;
+            background-color: #FEF8E8;
+        }
+
+        .form-control::placeholder {
+            color: #C4956A;
+        }
+
+        #btnSaveResident {
+            background: #28a745;
+            color: white;
+            font-weight: 600;
+            font-size: 1em;
+            padding: 12px 40px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            width: 48%;
+        }
+
+        #btnSaveResident:hover {
+            background: #218838;
+        }
+
+        .btn-cancel {
+            background: white;
+            color: #666;
+            font-weight: 600;
+            font-size: 1em;
+            padding: 12px 40px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            width: 48%;
+        }
+
+        .btn-cancel:hover {
+            background: #f8f9fa;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .invalid-feedback {
+            color: #e74c3c;
+            font-weight: 600;
+            font-size: 0.85em;
+            display: none;
+        }
+
+        .was-validated .form-control:invalid ~ .invalid-feedback,
+        .was-validated .form-select:invalid ~ .invalid-feedback {
+            display: block;
+        }
+
+        .form-floating {
+            margin-bottom: 20px;
+        }
+
+        .form-section {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .form-section:last-of-type {
+            border-bottom: none;
+        }
+
+        .form-section-title {
+            display: none;
+        }
+        
+        @media (max-width: 575.98px) {
+            #borrower-input {
+                padding: 20px;
+                border-radius: 15px;
+            }
+            .example {
+                font-size: 1.8em;
+                margin-bottom: 20px;
+            }
+            .margin-top20 {
+                margin-top: 15px !important;
+            }
+        }
+
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            .example {
+                font-size: 2em;
+            }
+            .margin-top20 {
+                margin-top: 15px;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            #borrower-input {
+                padding: 30px;
+            }
+        }
+
+        @media (min-width: 992px) and (max-width: 1199.98px) {
+            #borrower-input {
+                padding: 40px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <script type="text/javascript" src="jquery-min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resident Info</title>
+</head>
+
+<body>
+    <div class="overlay"></div>
+    <form id="residentForm" class="needs-validation" novalidate>
+
+        <div id="borrower-input" class="box">
+            <button type="button" class="close-btn" onclick="window.close()">&times;</button>
+            
+            <div class="row">
+                <div class="text-center col-md-12">
+                    <h1 class="text-black example">Add New Resident</h1>
+                    <p class="subtitle">Fill in the details below</p>
+                </div>
+
+                <!-- Household -->
+                <div class="mb-3 col-md-12">
+                    <label for="cboHousehold" class="form-label">Household <span class="required-asterisk">*</span></label>
+                    <select class="form-select" id="cboHousehold" name="cboHousehold" required>
+                        <option value="" selected>Zone 1 - 002-B ()</option>
+                    </select>
+                    <div class="invalid-feedback">Select Household</div>
+                </div>
+
+                <!-- First Name and Last Name -->
+                <div class="mb-3 col-md-6 col-12">
+                    <label for="txtFirstName" class="form-label">First Name <span class="required-asterisk">*</span></label>
+                    <input type="text" class="form-control" id="txtFirstName" name="txtFirstName" required placeholder="Enter first name">
+                    <div class="invalid-feedback">Input First Name</div>
+                </div>
+
+                <div class="mb-3 col-md-6 col-12">
+                    <label for="txtLastName" class="form-label">Last Name <span class="required-asterisk">*</span></label>
+                    <input type="text" class="form-control" id="txtLastName" name="txtLastName" required placeholder="Enter last name">
+                    <div class="invalid-feedback">Input Last Name</div>
+                </div>
+
+                <!-- Birth Date, Gender, Civil Status -->
+                <div class="mb-3 col-md-4 col-12">
+                    <label for="txtBirthDate" class="form-label">Birth Date <span class="required-asterisk">*</span></label>
+                    <input type="date" class="form-control" id="txtBirthDate" name="txtBirthDate" required placeholder="mm/dd/yyyy">
+                    <div class="invalid-feedback">Input Birth Date</div>
+                </div>
+
+                <div class="mb-3 col-md-4 col-12">
+                    <label for="cboGender" class="form-label">Gender <span class="required-asterisk">*</span></label>
+                    <select class="form-select" id="cboGender" name="cboGender" required>
+                        <option value="" selected>Male</option>
+                        <option>Female</option>
+                    </select>
+                    <div class="invalid-feedback">Select Gender</div>
+                </div>
+
+                <div class="mb-3 col-md-4 col-12">
+                    <label for="cboCivilStatus" class="form-label">Civil Status <span class="required-asterisk">*</span></label>
+                    <select class="form-select" id="cboCivilStatus" name="cboCivilStatus" required>
+                        <option value="" selected>Single</option>
+                        <option>Married</option>
+                        <option>Divorced</option>
+                        <option>Widowed</option>
+                    </select>
+                    <div class="invalid-feedback">Select Civil Status</div>
+                </div>
+
+                <!-- Educational Attainment -->
+                <div class="mb-3 col-md-12">
+                    <label for="txtEducationalAttainment" class="form-label">Educational Attainment</label>
+                    <input type="text" class="form-control" id="txtEducationalAttainment" name="txtEducationalAttainment" placeholder="e.g., College Graduate, High School Level">
+                </div>
+
+                <!-- Contact Number and Email -->
+                <div class="mb-3 col-md-6 col-12">
+                    <label for="txtContactNumber" class="form-label">Contact Number</label>
+                    <input type="tel" class="form-control" id="txtContactNumber" name="txtContactNumber" placeholder="e.g., 09171234567">
+                </div>
+
+                <div class="mb-3 col-md-6 col-12">
+                    <label for="txtEmail" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="txtEmail" name="txtEmail" placeholder="email@example.com">
+                </div>
+
+                <!-- Buttons -->
+                <div class="col-md-12 col-12">
+                    <div class="button-group">
+                        <button type="button" class="btn-cancel" onclick="window.history.back()">Cancel</button>
+                        <button type="submit" class="btn" id="btnSaveResident">Add Resident</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+</body>
+
+</html>
+
+<script>
+    $('#residentForm').on('submit', function(e) {
+        e.preventDefault();
+        // Bootstrap validation
+        if (!this.checkValidity()) {
+            this.classList.add('was-validated');
+            return;
+        }
+        // Form is valid, handle submission here
+        alert('Form submitted successfully!');
+    });
+</script>
+
+
+
+<script type="text/javascript" src="bootstrap.bundle.min.js"></script>
+
+<script>
+</script>

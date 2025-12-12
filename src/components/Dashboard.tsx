@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Users, Baby, Heart, Home, TrendingUp, Activity, FileText, ChevronRight, User, UserCog } from "lucide-react";
+import { Users, Baby, Heart, Home, TrendingUp, Activity, FileText, ChevronRight, User, UserCog, BarChart3, MapPin, Cake } from "lucide-react";
 import { useAuthStore } from "../stores/authStore";
 
 interface DashboardProps {
@@ -12,6 +12,19 @@ interface PopulationStats {
   female_count: number;
   total_households: number;
   average_age: number;
+}
+
+interface AgeDistribution {
+  age_group: string;
+  count: number;
+}
+
+interface ZoneStats {
+  zone_num: number;
+  household_count: number;
+  population: number;
+  male_count: number;
+  female_count: number;
 }
 
 interface AuditEntry {
@@ -33,6 +46,10 @@ const Dashboard = ({ totalPopulation }: DashboardProps) => {
   const [loading, setLoading] = useState(true);
   const [recentAudit, setRecentAudit] = useState<AuditEntry[]>([]);
   const [auditLoading, setAuditLoading] = useState(true);
+  const [ageDistribution, setAgeDistribution] = useState<AgeDistribution[]>([]);
+  const [ageLoading, setAgeLoading] = useState(true);
+  const [zoneStats, setZoneStats] = useState<ZoneStats[]>([]);
+  const [zoneLoading, setZoneLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -63,8 +80,38 @@ const Dashboard = ({ totalPopulation }: DashboardProps) => {
       }
     };
 
+    const fetchAgeDistribution = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/statistics/age-distribution`);
+        if (response.ok) {
+          const data = await response.json();
+          setAgeDistribution(data);
+        }
+      } catch (error) {
+        console.error('Error fetching age distribution:', error);
+      } finally {
+        setAgeLoading(false);
+      }
+    };
+
+    const fetchZoneStats = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/statistics/zones`);
+        if (response.ok) {
+          const data = await response.json();
+          setZoneStats(data);
+        }
+      } catch (error) {
+        console.error('Error fetching zone stats:', error);
+      } finally {
+        setZoneLoading(false);
+      }
+    };
+
     fetchStats();
     fetchRecentAudit();
+    fetchAgeDistribution();
+    fetchZoneStats();
   }, []);
 
   const getRelativeTime = (dateString: string) => {
@@ -108,6 +155,14 @@ const Dashboard = ({ totalPopulation }: DashboardProps) => {
       default:
         return <FileText className="w-4 h-4" />;
     }
+  };
+
+  const getAgeGroupColor = (ageGroup: string) => {
+    if (ageGroup.includes('Minor')) return { gradient: 'from-sun-500 to-sun-600', bg: 'bg-sun-500' };
+    if (ageGroup.includes('Young Adult')) return { gradient: 'from-forest-500 to-forest-600', bg: 'bg-forest-500' };
+    if (ageGroup.includes('Adult')) return { gradient: 'from-earth-500 to-earth-600', bg: 'bg-earth-500' };
+    if (ageGroup.includes('Middle-aged')) return { gradient: 'from-mahogany-500 to-mahogany-600', bg: 'bg-mahogany-500' };
+    return { gradient: 'from-forest-700 to-forest-800', bg: 'bg-forest-700' };
   };
 
   const statCards = [
@@ -205,6 +260,118 @@ const Dashboard = ({ totalPopulation }: DashboardProps) => {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Age Distribution & Zone Statistics */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+          {/* Age Distribution */}
+          <div className="animate-fade-in-up">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-forest-100 shadow-sm p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sun-500 to-sun-600 flex items-center justify-center shadow-md">
+                  <Cake className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-forest-950 font-display">Age Distribution</h2>
+                  <p className="text-sm text-earth-500">Population by age range</p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                {ageLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <svg className="animate-spin h-6 w-6 text-forest-600" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                  </div>
+                ) : ageDistribution.length === 0 ? (
+                  <div className="text-center py-8">
+                    <BarChart3 className="w-10 h-10 text-earth-300 mx-auto mb-2" />
+                    <p className="text-earth-400 text-sm">No age data available</p>
+                  </div>
+                ) : (
+                  ageDistribution.map((age) => {
+                    const maxCount = Math.max(...ageDistribution.map(a => a.count));
+                    const percentage = maxCount > 0 ? (age.count / maxCount) * 100 : 0;
+                    const colors = getAgeGroupColor(age.age_group);
+                    
+                    return (
+                      <div key={age.age_group} className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-semibold text-forest-800">{age.age_group}</span>
+                          <span className="text-sm font-bold text-forest-900">{age.count}</span>
+                        </div>
+                        <div className="h-3 bg-earth-100 rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full bg-gradient-to-r ${colors.gradient} transition-all duration-500 rounded-full`}
+                            style={{ width: `${percentage}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Zone Statistics */}
+          <div className="animate-fade-in-up">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-forest-100 shadow-sm p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-forest-500 to-forest-600 flex items-center justify-center shadow-md">
+                  <MapPin className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-forest-950 font-display">Zone Statistics</h2>
+                  <p className="text-sm text-earth-500">Population by zone</p>
+                </div>
+              </div>
+              <div className="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
+                {zoneLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <svg className="animate-spin h-6 w-6 text-forest-600" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                  </div>
+                ) : zoneStats.length === 0 ? (
+                  <div className="text-center py-8">
+                    <MapPin className="w-10 h-10 text-earth-300 mx-auto mb-2" />
+                    <p className="text-earth-400 text-sm">No zone data available</p>
+                  </div>
+                ) : (
+                  zoneStats.map((zone) => (
+                    <div key={zone.zone_num} className="p-4 bg-gradient-to-r from-forest-50 to-earth-50 rounded-xl border border-forest-100 hover:shadow-md transition-all">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="flex items-center justify-center w-8 h-8 text-sm font-bold rounded-lg bg-forest-600 text-white shadow-sm">
+                            {zone.zone_num}
+                          </span>
+                          <span className="font-bold text-forest-950">Zone {zone.zone_num}</span>
+                        </div>
+                        <span className="text-lg font-bold text-forest-900">{zone.population}</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 text-xs">
+                        <div className="flex items-center gap-1.5 px-2 py-1.5 bg-white rounded-lg">
+                          <Home className="w-3.5 h-3.5 text-forest-600" />
+                          <span className="font-medium text-earth-600">{zone.household_count}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 px-2 py-1.5 bg-white rounded-lg">
+                          <Users className="w-3.5 h-3.5 text-earth-600" />
+                          <span className="font-medium text-earth-600">{zone.male_count}M</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 px-2 py-1.5 bg-white rounded-lg">
+                          <Users className="w-3.5 h-3.5 text-mahogany-600" />
+                          <span className="font-medium text-earth-600">{zone.female_count}F</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

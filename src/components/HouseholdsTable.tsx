@@ -53,6 +53,14 @@ const HouseholdsTable = () => {
   // Delete confirmation state
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  
+  // Add household modal state
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addFormData, setAddFormData] = useState<Omit<HouseholdFormData, 'status' | 'head_resident_id'>>({
+    zone_num: 1,
+    house_num: "",
+  });
+  const [addSubmitting, setAddSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchHouseholds = async () => {
@@ -229,6 +237,47 @@ const HouseholdsTable = () => {
     setSelectedHousehold(null);
   };
 
+  // Add household handlers
+  const handleAddInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setAddFormData(prev => ({ ...prev, [name]: name === 'zone_num' ? Number.parseInt(value, 10) : value }));
+  };
+
+  const resetAddForm = () => {
+    setAddFormData({
+      zone_num: 1,
+      house_num: "",
+    });
+  };
+
+  const handleAddSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAddSubmitting(true);
+    
+    try {
+      const response = await fetch(`${API_URL}/api/households`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(user?.acc_id && { 'X-User-Id': String(user.acc_id) }),
+        },
+        body: JSON.stringify(addFormData),
+      });
+
+      if (!response.ok) throw new Error('Failed to create household');
+
+      const newHousehold = await response.json();
+      setHouseholds(prev => [...prev, { ...newHousehold, resident_count: 0 }]);
+      setShowAddModal(false);
+      resetAddForm();
+    } catch (err) {
+      console.error("Error creating household:", err);
+      alert("Failed to create household. Please try again.");
+    } finally {
+      setAddSubmitting(false);
+    }
+  };
+
   const filteredHouseholds = households.filter(
     (household) =>
       household.house_num.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -238,16 +287,16 @@ const HouseholdsTable = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-earth-50 via-earth-100 to-forest-50">
       {/* Background decorations */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-20 right-20 w-96 h-96 rounded-full bg-forest-200/20 blur-3xl"></div>
-        <div className="absolute bottom-20 left-20 w-80 h-80 rounded-full bg-sun-200/20 blur-3xl"></div>
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute rounded-full top-20 right-20 w-96 h-96 bg-forest-200/20 blur-3xl"></div>
+        <div className="absolute rounded-full bottom-20 left-20 w-80 h-80 bg-sun-200/20 blur-3xl"></div>
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="relative px-4 py-10 mx-auto max-w-7xl sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-10 animate-fade-in-up">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-forest-600 to-forest-700 flex items-center justify-center shadow-lg">
+            <div className="flex items-center justify-center w-12 h-12 shadow-lg rounded-xl bg-gradient-to-br from-forest-600 to-forest-700">
               <Building className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -258,19 +307,22 @@ const HouseholdsTable = () => {
         </div>
 
         {/* Search and Actions */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-forest-100 shadow-sm mb-8 animate-fade-in-up">
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div className="p-6 mb-8 border shadow-sm bg-white/80 backdrop-blur-sm rounded-2xl border-forest-100 animate-fade-in-up">
+          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div className="relative flex-1 w-full">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-earth-400" />
+              <Search className="absolute w-5 h-5 transform -translate-y-1/2 left-4 top-1/2 text-earth-400" />
               <input
                 type="text"
                 placeholder="Search by house number or zone..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-earth-50 border border-earth-200 rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-transparent transition-all placeholder:text-earth-400"
+                className="w-full py-3 pl-12 pr-4 transition-all border bg-earth-50 border-earth-200 rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-transparent placeholder:text-earth-400"
               />
             </div>
-            <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-forest-600 to-forest-500 hover:from-forest-500 hover:to-forest-400 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+            <button 
+              onClick={() => setShowAddModal(true)}
+              className="flex items-center justify-center w-full gap-2 px-6 py-3 text-white transition-all duration-300 shadow-lg sm:w-auto bg-gradient-to-r from-forest-600 to-forest-500 hover:from-forest-500 hover:to-forest-400 rounded-xl hover:shadow-xl"
+            >
               <Home className="w-5 h-5" />
               <span className="font-semibold">Add Household</span>
             </button>
@@ -278,21 +330,21 @@ const HouseholdsTable = () => {
         </div>
 
         {/* Table */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-forest-100 shadow-sm overflow-hidden animate-fade-in-up">
+        <div className="overflow-hidden border shadow-sm bg-white/80 backdrop-blur-sm rounded-2xl border-forest-100 animate-fade-in-up">
           <div className="overflow-x-auto">
             {loading ? (
-              <div className="text-center py-16">
+              <div className="py-16 text-center">
                 <div className="inline-flex items-center gap-3">
-                  <svg className="animate-spin h-6 w-6 text-forest-600" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 animate-spin text-forest-600" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  <span className="text-earth-600 font-medium">Loading households...</span>
+                  <span className="font-medium text-earth-600">Loading households...</span>
                 </div>
               </div>
             ) : error ? (
-              <div className="text-center py-16">
-                <p className="text-mahogany-600 font-medium">{error}</p>
+              <div className="py-16 text-center">
+                <p className="font-medium text-mahogany-600">{error}</p>
               </div>
             ) : (
               <table className="data-table">
@@ -309,11 +361,11 @@ const HouseholdsTable = () => {
                     <tr 
                       key={household.household_id}
                       onClick={() => handleHouseholdClick(household)}
-                      className="cursor-pointer hover:bg-forest-50/50 transition-colors"
+                      className="transition-colors cursor-pointer hover:bg-forest-50/50"
                     >
                       <td>
                         <span className="inline-flex items-center gap-2">
-                          <span className="w-8 h-8 rounded-lg bg-forest-100 text-forest-700 flex items-center justify-center font-semibold text-sm">
+                          <span className="flex items-center justify-center w-8 h-8 text-sm font-semibold rounded-lg bg-forest-100 text-forest-700">
                             {household.zone_num}
                           </span>
                           <span className="font-medium">Zone {household.zone_num}</span>
@@ -342,8 +394,8 @@ const HouseholdsTable = () => {
                           {expandedHouseholds.has(household.household_id) && (
                             <div className="pl-2 space-y-1 animate-fade-in-up">
                               {loadingResidents.has(household.household_id) ? (
-                                <div className="flex items-center gap-2 text-earth-500 text-sm">
-                                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                                <div className="flex items-center gap-2 text-sm text-earth-500">
+                                  <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24">
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                                   </svg>
@@ -357,20 +409,20 @@ const HouseholdsTable = () => {
                                     className="block w-full text-left px-3 py-1.5 text-sm rounded-lg hover:bg-forest-50 text-forest-700 hover:text-forest-900 transition-colors"
                                   >
                                     <span className="font-medium">{resident.first_name} {resident.last_name}</span>
-                                    <span className="text-earth-400 ml-2">
+                                    <span className="ml-2 text-earth-400">
                                       ({resident.gender === 'male' ? 'M' : 'F'}, {resident.civil_status})
                                     </span>
                                   </button>
                                 ))
                               ) : (
-                                <p className="text-earth-400 text-sm italic px-3 py-1">No residents found</p>
+                                <p className="px-3 py-1 text-sm italic text-earth-400">No residents found</p>
                               )}
                             </div>
                           )}
                         </div>
                       </td>
                       <td>
-                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-forest-100 text-forest-700">
+                        <span className="px-3 py-1 text-xs font-medium rounded-full bg-forest-100 text-forest-700">
                           {household.status.charAt(0).toUpperCase() + household.status.slice(1)}
                         </span>
                       </td>
@@ -382,7 +434,7 @@ const HouseholdsTable = () => {
           </div>
 
           {!loading && !error && filteredHouseholds.length === 0 && (
-            <div className="text-center py-16">
+            <div className="py-16 text-center">
               <p className="text-earth-500">No households found matching your search.</p>
             </div>
           )}
@@ -390,7 +442,7 @@ const HouseholdsTable = () => {
 
         {/* Results count */}
         {!loading && !error && (
-          <div className="mt-6 text-sm text-earth-600 font-medium">
+          <div className="mt-6 text-sm font-medium text-earth-600">
             Showing {filteredHouseholds.length} of {households.length} households
           </div>
         )}
@@ -402,17 +454,17 @@ const HouseholdsTable = () => {
           <div className="w-full max-w-2xl animate-fade-in-up">
             <div className="relative p-8 bg-white shadow-2xl rounded-3xl max-h-[90vh] overflow-y-auto custom-scrollbar">
               {/* Decorative background */}
-              <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-sun-200/50 to-transparent rounded-bl-full"></div>
+              <div className="absolute top-0 right-0 w-40 h-40 rounded-bl-full bg-gradient-to-bl from-sun-200/50 to-transparent"></div>
               
               <div className="relative">
                 <div className="flex items-center justify-between mb-8">
                   <div>
                     <h2 className="text-2xl font-bold text-forest-950 font-display">Edit Household</h2>
-                    <p className="text-sm text-earth-500 mt-1">Update household information</p>
+                    <p className="mt-1 text-sm text-earth-500">Update household information</p>
                   </div>
                   <button
                     onClick={handleCloseModals}
-                    className="p-2 text-earth-400 hover:text-forest-700 hover:bg-forest-50 rounded-xl transition-colors"
+                    className="p-2 transition-colors text-earth-400 hover:text-forest-700 hover:bg-forest-50 rounded-xl"
                   >
                     <X className="w-6 h-6" />
                   </button>
@@ -420,7 +472,7 @@ const HouseholdsTable = () => {
 
                 <form onSubmit={handleEditSubmit} className="space-y-6">
                   {/* Zone and House Number */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div>
                       <label className="block mb-2 text-sm font-semibold text-forest-800">
                         Zone Number <span className="text-mahogany-500">*</span>
@@ -432,7 +484,7 @@ const HouseholdsTable = () => {
                         onChange={handleEditInputChange}
                         required
                         min="1"
-                        className="w-full px-4 py-3 bg-earth-50 border border-earth-200 rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 transition-all border bg-earth-50 border-earth-200 rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-transparent"
                       />
                     </div>
 
@@ -446,14 +498,14 @@ const HouseholdsTable = () => {
                         value={editFormData.house_num}
                         onChange={handleEditInputChange}
                         required
-                        className="w-full px-4 py-3 bg-earth-50 border border-earth-200 rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-transparent transition-all placeholder:text-earth-400"
+                        className="w-full px-4 py-3 transition-all border bg-earth-50 border-earth-200 rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-transparent placeholder:text-earth-400"
                         placeholder="Enter house number"
                       />
                     </div>
                   </div>
 
                   {/* Status and Head Resident */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div>
                       <label className="block mb-2 text-sm font-semibold text-forest-800">
                         Status <span className="text-mahogany-500">*</span>
@@ -463,7 +515,7 @@ const HouseholdsTable = () => {
                         value={editFormData.status}
                         onChange={handleEditInputChange}
                         required
-                        className="w-full px-4 py-3 bg-earth-50 border border-earth-200 rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 transition-all border bg-earth-50 border-earth-200 rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-transparent"
                       >
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
@@ -479,7 +531,7 @@ const HouseholdsTable = () => {
                         name="head_resident_id"
                         value={editFormData.head_resident_id}
                         onChange={handleEditInputChange}
-                        className="w-full px-4 py-3 bg-earth-50 border border-earth-200 rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 transition-all border bg-earth-50 border-earth-200 rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-transparent"
                       >
                         <option value="">No head assigned</option>
                         {selectedHousehold.residents?.map((resident) => (
@@ -496,7 +548,7 @@ const HouseholdsTable = () => {
                     <button
                       type="button"
                       onClick={handleDeleteClick}
-                      className="px-6 py-3 bg-mahogany-600 hover:bg-mahogany-500 text-white rounded-xl transition-colors font-semibold flex items-center gap-2"
+                      className="flex items-center gap-2 px-6 py-3 font-semibold text-white transition-colors bg-mahogany-600 hover:bg-mahogany-500 rounded-xl"
                     >
                       <Trash2 className="w-5 h-5" />
                       Delete
@@ -505,14 +557,14 @@ const HouseholdsTable = () => {
                     <button
                       type="button"
                       onClick={handleCloseModals}
-                      className="px-6 py-3 border-2 border-earth-200 text-earth-700 rounded-xl hover:bg-earth-50 transition-colors font-semibold"
+                      className="px-6 py-3 font-semibold transition-colors border-2 border-earth-200 text-earth-700 rounded-xl hover:bg-earth-50"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={submitting}
-                      className="px-6 py-3 bg-gradient-to-r from-forest-600 to-forest-500 hover:from-forest-500 hover:to-forest-400 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:from-earth-400 disabled:to-earth-400 disabled:cursor-not-allowed font-semibold"
+                      className="px-6 py-3 font-semibold text-white transition-all duration-300 shadow-lg bg-gradient-to-r from-forest-600 to-forest-500 hover:from-forest-500 hover:to-forest-400 rounded-xl hover:shadow-xl disabled:from-earth-400 disabled:to-earth-400 disabled:cursor-not-allowed"
                     >
                       {submitting ? "Saving..." : "Save Changes"}
                     </button>
@@ -524,30 +576,120 @@ const HouseholdsTable = () => {
         </div>
       )}
 
+      {/* Add Household Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-forest-950/60 backdrop-blur-sm">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-fade-in-up">
+            <div className="relative p-8 bg-white shadow-2xl rounded-3xl">
+              {/* Close button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAddModal(false);
+                  resetAddForm();
+                }}
+                className="absolute flex items-center justify-center w-10 h-10 transition-colors top-6 right-6 rounded-xl bg-earth-100 hover:bg-earth-200 text-earth-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Modal Header */}
+              <div className="mb-6">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center justify-center w-12 h-12 shadow-lg rounded-xl bg-gradient-to-br from-forest-600 to-forest-700">
+                    <Home className="w-6 h-6 text-white" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-forest-950 font-display">Add New Household</h2>
+                </div>
+                <p className="text-earth-600 font-body">Create a new household record</p>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleAddSubmit} className="space-y-6">
+                {/* Zone and House Number */}
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="block mb-2 text-sm font-semibold text-forest-800">
+                      Zone Number <span className="text-mahogany-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      name="zone_num"
+                      value={addFormData.zone_num}
+                      onChange={handleAddInputChange}
+                      required
+                      min="1"
+                      className="w-full px-4 py-3 transition-all border bg-earth-50 border-earth-200 rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-transparent"
+                      placeholder="Enter zone number"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block mb-2 text-sm font-semibold text-forest-800">
+                      House Number <span className="text-mahogany-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="house_num"
+                      value={addFormData.house_num}
+                      onChange={handleAddInputChange}
+                      required
+                      className="w-full px-4 py-3 transition-all border bg-earth-50 border-earth-200 rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-transparent"
+                      placeholder="Enter house number"
+                    />
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-4 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAddModal(false);
+                      resetAddForm();
+                    }}
+                    className="flex-1 px-6 py-3 font-semibold transition-colors border-2 border-earth-200 text-earth-700 rounded-xl hover:bg-earth-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={addSubmitting}
+                    className="flex-1 px-6 py-3 font-semibold text-white transition-all duration-300 shadow-lg bg-gradient-to-r from-forest-600 to-forest-500 hover:from-forest-500 hover:to-forest-400 rounded-xl hover:shadow-xl disabled:from-earth-400 disabled:to-earth-400 disabled:cursor-not-allowed"
+                  >
+                    {addSubmitting ? "Creating..." : "Create Household"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && selectedHousehold && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-forest-950/60 backdrop-blur-sm">
           <div className="w-full max-w-md animate-fade-in-up">
             <div className="relative p-8 bg-white shadow-2xl rounded-3xl">
               <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 rounded-full bg-mahogany-100 flex items-center justify-center mb-4">
+                <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-mahogany-100">
                   <AlertTriangle className="w-8 h-8 text-mahogany-600" />
                 </div>
-                <h3 className="text-xl font-bold text-forest-950 font-display mb-2">Delete Household?</h3>
-                <p className="text-earth-600 mb-6">
+                <h3 className="mb-2 text-xl font-bold text-forest-950 font-display">Delete Household?</h3>
+                <p className="mb-6 text-earth-600">
                   Are you sure you want to delete the household <span className="font-semibold">House #{selectedHousehold.house_num} (Zone {selectedHousehold.zone_num})</span>? This action will archive the household and cannot be undone.
                 </p>
-                <div className="flex gap-4 w-full">
+                <div className="flex w-full gap-4">
                   <button
                     onClick={() => setShowDeleteConfirm(false)}
-                    className="flex-1 px-6 py-3 border-2 border-earth-200 text-earth-700 rounded-xl hover:bg-earth-50 transition-colors font-semibold"
+                    className="flex-1 px-6 py-3 font-semibold transition-colors border-2 border-earth-200 text-earth-700 rounded-xl hover:bg-earth-50"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleDeleteConfirm}
                     disabled={deleting}
-                    className="flex-1 px-6 py-3 bg-mahogany-600 hover:bg-mahogany-500 text-white rounded-xl transition-colors font-semibold disabled:bg-earth-400 disabled:cursor-not-allowed"
+                    className="flex-1 px-6 py-3 font-semibold text-white transition-colors bg-mahogany-600 hover:bg-mahogany-500 rounded-xl disabled:bg-earth-400 disabled:cursor-not-allowed"
                   >
                     {deleting ? "Deleting..." : "Delete"}
                   </button>
