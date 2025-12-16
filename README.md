@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # NSR Population Tracker
 
 A comprehensive population tracking and management system built with PHP and MySQL.
@@ -255,3 +256,6 @@ If you encounter any issues not covered in this guide, please check the document
 - Updated PHP and MySQL versions
 - Proper error handling (disable `display_errors`)
 - Regular backups
+=======
+follow the setup guide
+>>>>>>> 18f984af9c0341a68173c23eaf84c1c32a479c52
