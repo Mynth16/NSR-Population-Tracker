@@ -6,8 +6,8 @@ USE nsr_population_tracker;
 -- admin password: admin123
 -- staff1 password: staff123
 INSERT INTO account (username, password, role) VALUES
-('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'A'),
-('staff1', '$2y$10$TKh8H1.PfQx37YgCzwiKb.KjNyWgaHb9cbcoQgdIVFlYg7B77UdFm', 'S');
+('admin', '$2y$12$JPMHokE4XbZeKzQUscc5uOU2OF6jpJhorDaPjWc6G3LUrY84ofuDG', 'A'),
+('staff1', '$2y$12$GR7OkerAdiSm6A5QwnR27.MPobillE1sowpVTvMXGlhEA7d4ALWEu', 'S');
 
 -- Leadership
 INSERT INTO staff (first_name, last_name, title, category, picture) VALUES
