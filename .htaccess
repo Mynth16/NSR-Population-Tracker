@@ -1,0 +1,22 @@
+# Enable rewrite engine
+RewriteEngine On
+
+# Redirect API requests to proper PHP files
+RewriteRule ^api/residents(.*)$ backend/api/residents.php$1 [L,QSA]
+RewriteRule ^api/households(.*)$ backend/api/households.php$1 [L,QSA]
+RewriteRule ^api/statistics(.*)$ backend/api/statistics.php$1 [L,QSA]
+RewriteRule ^api/staff(.*)$ backend/api/staff.php$1 [L,QSA]
+RewriteRule ^api/accounts(.*)$ backend/api/accounts.php$1 [L,QSA]
+RewriteRule ^api/audit-trail(.*)$ backend/api/audit-trail.php$1 [L,QSA]
+RewriteRule ^api/auth(.*)$ backend/api/auth.php$1 [L,QSA]
+
+# Disable directory browsing
+Options -Indexes
+
+# Set default charset
+AddDefaultCharset UTF-8
+
+# Enable CORS for local development
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+Header set Access-Control-Allow-Headers "Content-Type, X-User-Id"
