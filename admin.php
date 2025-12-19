@@ -73,6 +73,10 @@ Auth::startSession();
                         <i class="w-5 mr-3 fas fa-home"></i>
                         <span>Households</span>
                     </a>
+                    <a href="javascript:void(0)" class="flex items-center px-4 py-3 mb-2 transition-colors rounded-lg nav-item hover:bg-forest-800" data-page="accounts">
+                        <i class="w-5 mr-3 fas fa-user-cog"></i>
+                        <span>Account Management</span>
+                    </a>
                     <a href="javascript:void(0)" class="flex items-center px-4 py-3 mb-2 transition-colors rounded-lg nav-item hover:bg-forest-800" data-page="audit-trail">
                         <i class="w-5 mr-3 fas fa-history"></i>
                         <span>Audit Trail</span>
@@ -117,6 +121,7 @@ Auth::startSession();
     <script src="assets/js/dashboard.js"></script>
     <script src="assets/js/population.js"></script>
     <script src="assets/js/households.js"></script>
+    <script src="assets/js/accounts.js"></script>
     <script src="assets/js/audit.js"></script>
     <script src="assets/js/app.js"></script>
 </body>

@@ -73,6 +73,16 @@ class Auth {
         }
     }
 
+    public static function requireAdmin() {
+        self::requireAuth();
+        $user = self::getCurrentUser();
+        if (!$user || $user['role'] !== 'A') {
+            http_response_code(403);
+            echo json_encode(['error' => 'Forbidden - Admin access required']);
+            exit();
+        }
+    }
+
     public static function getUserIdFromHeader() {
         $headers = getallheaders();
         return $headers['X-User-Id'] ?? null;

@@ -96,6 +96,9 @@ function loadPage(page) {
         case 'households':
             loadHouseholds();
             break;
+        case 'accounts':
+            loadAccounts();
+            break;
         case 'audit-trail':
             loadAuditTrail();
             break;
