@@ -1,0 +1,82 @@
+# NSR Population Tracker - Production Docker Compose
+# Run with: docker compose -f docker-compose.prod.yml up -d
+
+version: '3.8'
+
+services:
+  # PHP/Apache Application (uses pre-built image)
+  app:
+    image: gabcat/nsr-population-tracker:latest
+    container_name: nsr-population-tracker
+    restart: always
+    ports:
+      - "80:80"
+    environment:
+      - DB_HOST=db
+      - DB_USER=${DB_USER:-nsr_user}
+      - DB_PASSWORD=${DB_PASSWORD:-nsr_password}
+      - DB_NAME=${DB_NAME:-nsr_population_tracker}
+      - BASE_URL=
+      - APP_ENV=production
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - nsr-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: nsr-database
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root_password}
+      - MYSQL_DATABASE=${DB_NAME:-nsr_population_tracker}
+      - MYSQL_USER=${DB_USER:-nsr_user}
+      - MYSQL_PASSWORD=${DB_PASSWORD:-nsr_password}
+    volumes:
+      - nsr-db-data:/var/lib/mysql
+      - ./backend/database.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./backend/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+    networks:
+      - nsr-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root_password}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  nsr-network:
+    driver: bridge
+
+volumes:
+  nsr-db-data:
+    driver: local

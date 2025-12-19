@@ -39,7 +39,7 @@ $(document).ready(function() {
         console.log('Auth data:', authData);
         if (authData && authData.user) {
             $('#user-name').text(authData.user.username);
-            $('#user-role').text(authData.user.role.charAt(0).toUpperCase() + authData.user.role.slice(1));
+            $('#user-role').text(authData.user.role === 'A' ? 'Admin' : (authData.user.role === 'S' ? 'Staff' : 'Viewer'));
         }
         
         // Add event listeners for navigation links using event delegation

@@ -1,6 +1,9 @@
 # Enable rewrite engine
 RewriteEngine On
 
+# Serve index.php for root URL
+RewriteRule ^$ index.php [L]
+
 # Redirect API requests to proper PHP files
 RewriteRule ^api/residents(.*)$ backend/api/residents.php$1 [L,QSA]
 RewriteRule ^api/households(.*)$ backend/api/households.php$1 [L,QSA]
@@ -17,6 +20,8 @@ Options -Indexes
 AddDefaultCharset UTF-8
 
 # Enable CORS for local development
-Header set Access-Control-Allow-Origin "*"
-Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-Header set Access-Control-Allow-Headers "Content-Type, X-User-Id"
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, X-User-Id"
+</IfModule>
