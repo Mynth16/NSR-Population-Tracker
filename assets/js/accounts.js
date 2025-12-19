@@ -21,7 +21,8 @@ function loadAccounts() {
 
         <!-- Accounts Table -->
         <div class="overflow-hidden bg-white shadow-md rounded-xl">
-            <div class="overflow-x-auto">
+            <!-- Desktop Table View -->
+            <div class="desktop-table-view overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-forest-50">
                         <tr>
@@ -39,6 +40,13 @@ function loadAccounts() {
                         </tr>
                     </tbody>
                 </table>
+            </div>
+            
+            <!-- Mobile Card View -->
+            <div class="mobile-card-view p-4" id="accounts-mobile-view">
+                <div class="text-center py-12 text-gray-500">
+                    <i class="fas fa-spinner fa-spin"></i> Loading...
+                </div>
             </div>
         </div>
     `;
@@ -85,9 +93,11 @@ function renderAccountsTable() {
                 </td>
             </tr>
         `);
+        $('#accounts-mobile-view').html('<div class="text-center py-8 text-gray-500">No accounts found</div>');
         return;
     }
     
+    // Desktop table view
     const rows = accountsData.map(account => {
         const roleColor = account.role === 'A' ? 'bg-mahogany-100 text-mahogany-700' :
                          account.role === 'S' ? 'bg-sun-100 text-sun-700' :
@@ -124,6 +134,40 @@ function renderAccountsTable() {
     }).join('');
     
     $('#accounts-table-body').html(rows);
+    
+    // Mobile card view
+    const cards = accountsData.map(account => {
+        const roleColor = account.role === 'A' ? 'bg-mahogany-100 text-mahogany-700' :
+                         account.role === 'S' ? 'bg-sun-100 text-sun-700' :
+                         'bg-gray-100 text-gray-700';
+        
+        return `
+            <div class="mobile-data-card">
+                <div class="card-row">
+                    <span class="card-label">Username</span>
+                    <span class="card-value font-semibold">${account.username}</span>
+                </div>
+                <div class="card-row">
+                    <span class="card-label">Role</span>
+                    <span class="card-value"><span class="inline-flex px-2 text-xs font-semibold leading-5 rounded-full ${roleColor}">${displayRole(account.role)}</span></span>
+                </div>
+                <div class="card-row">
+                    <span class="card-label">Created</span>
+                    <span class="card-value">${formatDate(account.created_at)}</span>
+                </div>
+                <div class="card-actions">
+                    <button class="flex-1 bg-gradient-to-r from-forest-600 to-forest-500 hover:from-forest-700 hover:to-forest-600 text-white px-4 py-2 rounded-lg edit-account-btn" data-id="${account.acc_id}">
+                        <i class="fas fa-edit mr-2"></i>Edit
+                    </button>
+                    <button class="flex-1 bg-mahogany-600 hover:bg-mahogany-700 text-white px-4 py-2 rounded-lg delete-account-btn" data-id="${account.acc_id}">
+                        <i class="fas fa-trash mr-2"></i>Delete
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    $('#accounts-mobile-view').html(cards);
     
     // Attach event listeners
     $('.edit-account-btn').off('click').on('click', function() {

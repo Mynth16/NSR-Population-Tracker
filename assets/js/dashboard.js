@@ -7,7 +7,7 @@ function loadDashboard() {
         </div>
 
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div id="stats-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 sm:gap-6 mb-6 sm:mb-8">
             <div class="glass-card p-6">
                 <div class="flex items-center justify-between mb-4">
                     <div class="w-12 h-12 bg-gradient-to-br from-forest-500 to-forest-600 rounded-lg flex items-center justify-center">
@@ -52,6 +52,28 @@ function loadDashboard() {
                 </div>
                 <p class="text-sm text-earth-600 mb-1">Female</p>
                 <p class="text-3xl font-bold text-forest-900" id="stat-female">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </p>
+            </div>
+            <div class="glass-card p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-vote-yea text-white text-xl"></i>
+                    </div>
+                </div>
+                <p class="text-sm text-earth-600 mb-1">Registered Voters</p>
+                <p class="text-3xl font-bold text-forest-900" id="stat-registered-voters">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </p>
+            </div>
+            <div class="glass-card p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-gray-500 to-gray-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-wheelchair text-white text-xl"></i>
+                    </div>
+                </div>
+                <p class="text-sm text-earth-600 mb-1">PWD</p>
+                <p class="text-3xl font-bold text-forest-900" id="stat-pwd">
                     <i class="fas fa-spinner fa-spin"></i>
                 </p>
             </div>
@@ -120,6 +142,8 @@ function loadPopulationStats() {
             $('#stat-total-households').text(data.total_households || 0);
             $('#stat-male').text(data.male_count || 0);
             $('#stat-female').text(data.female_count || 0);
+            $('#stat-registered-voters').text(data.registered_voter_count || 0);
+            $('#stat-pwd').text(data.pwd_count || 0);
         },
         error: function(xhr, status, error) {
             console.error('Population stats error:', status, error);

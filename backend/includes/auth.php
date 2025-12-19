@@ -83,6 +83,16 @@ class Auth {
         }
     }
 
+    public static function requireEditor() {
+        self::requireAuth();
+        $user = self::getCurrentUser();
+        if (!$user || $user['role'] === 'V') {
+            http_response_code(403);
+            echo json_encode(['error' => 'Forbidden - Viewers cannot edit data']);
+            exit();
+        }
+    }
+
     public static function getUserIdFromHeader() {
         $headers = getallheaders();
         return $headers['X-User-Id'] ?? null;

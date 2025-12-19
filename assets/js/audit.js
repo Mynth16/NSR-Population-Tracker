@@ -50,7 +50,8 @@ function loadAuditTrail() {
 
         <!-- Audit Trail Table -->
         <div class="glass-card overflow-hidden">
-            <div class="overflow-x-auto custom-scrollbar">
+            <!-- Desktop Table View -->
+            <div class="desktop-table-view overflow-x-auto custom-scrollbar">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -69,6 +70,13 @@ function loadAuditTrail() {
                         </tr>
                     </tbody>
                 </table>
+            </div>
+            
+            <!-- Mobile Card View -->
+            <div class="mobile-card-view p-4" id="audit-mobile-view">
+                <div class="text-center py-12">
+                    <i class="fas fa-spinner fa-spin text-4xl text-forest-600"></i>
+                </div>
             </div>
         </div>
     `;
@@ -119,9 +127,11 @@ function fetchAuditTrail() {
 function renderAuditTrail(data) {
     if (data.length === 0) {
         $('#audit-table-body').html('<tr><td colspan="5" class="text-center py-8 text-earth-600">No audit entries found</td></tr>');
+        $('#audit-mobile-view').html('<div class="text-center py-8 text-earth-600">No audit entries found</div>');
         return;
     }
 
+    // Desktop table view
     const rows = data.map(entry => {
         const actionClass = entry.change_type === 'C' ? 'bg-green-100 text-green-800' :
                           entry.change_type === 'U' ? 'bg-blue-100 text-blue-800' :
@@ -142,10 +152,53 @@ function renderAuditTrail(data) {
                         ${displayChangeType(entry.change_type)}
                     </span>
                 </td>
-                <td class="text-sm">${entry.details}</td>
+                <td class="text-sm">${entry.details || 'N/A'}</td>
             </tr>
         `;
     }).join('');
 
     $('#audit-table-body').html(rows);
+    
+    // Mobile card view
+    const cards = data.map(entry => {
+        const actionClass = entry.change_type === 'C' ? 'bg-green-100 text-green-800' :
+                          entry.change_type === 'U' ? 'bg-blue-100 text-blue-800' :
+                          'bg-red-100 text-red-800';
+        
+        const actionIcon = entry.change_type === 'C' ? 'plus-circle' :
+                          entry.change_type === 'U' ? 'edit' :
+                          'trash-alt';
+        
+        return `
+            <div class="mobile-data-card">
+                <div class="card-row">
+                    <span class="card-label">Date & Time</span>
+                    <span class="card-value text-sm">${formatDateTime(entry.change_date)}</span>
+                </div>
+                <div class="card-row">
+                    <span class="card-label">User</span>
+                    <span class="card-value">${entry.username || 'System'}</span>
+                </div>
+                <div class="card-row">
+                    <span class="card-label">Type</span>
+                    <span class="card-value"><span class="px-2 py-1 rounded-full text-xs bg-earth-200 text-earth-800">${displayRecordType(entry.record_type)}</span></span>
+                </div>
+                <div class="card-row">
+                    <span class="card-label">Action</span>
+                    <span class="card-value">
+                        <span class="px-2 py-1 rounded-full text-xs ${actionClass} inline-flex items-center">
+                            <i class="fas fa-${actionIcon} mr-1"></i>
+                            ${displayChangeType(entry.change_type)}
+                        </span>
+                    </span>
+                </div>
+                <div class="card-row">
+                    <span class="card-label">Details</span>
+                    <span class="card-value text-sm">${entry.details || 'N/A'}</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    $('#audit-mobile-view').html(cards);
 }

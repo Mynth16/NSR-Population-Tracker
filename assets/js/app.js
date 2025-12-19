@@ -15,6 +15,17 @@ $(document).ready(function() {
     console.log('Current pathname:', window.location.pathname);
     console.log('Current href:', window.location.href);
     
+    // Mobile Menu Toggle
+    $('#mobile-menu-btn').on('click', function() {
+        $('#admin-sidebar').removeClass('-translate-x-full');
+        $('#sidebar-overlay').removeClass('hidden');
+    });
+    
+    $('#close-sidebar-btn, #sidebar-overlay').on('click', function() {
+        $('#admin-sidebar').addClass('-translate-x-full');
+        $('#sidebar-overlay').addClass('hidden');
+    });
+    
     // Check authentication for admin page - check multiple conditions
     const isAdminPage = window.location.pathname.includes('admin.php') || 
                         window.location.href.includes('admin.php') ||
@@ -219,6 +230,10 @@ const DisplayMaps = {
         'C': 'Create',
         'U': 'Update',
         'D': 'Delete'
+    },
+    yesNo: {
+        'Y': 'Yes',
+        'N': 'No'
     }
 };
 
@@ -245,6 +260,10 @@ function displayStaffCategory(code) {
 
 function displayRole(code) {
     return DisplayMaps.role[code] || code;
+}
+
+function displayYesNo(code) {
+    return DisplayMaps.yesNo[code] || code;
 }
 
 function displayRecordType(code) {

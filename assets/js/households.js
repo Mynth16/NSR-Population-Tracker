@@ -19,21 +19,31 @@ function loadHouseholds() {
         </div>
 
         <div class="glass-card overflow-hidden">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Zone</th>
-                        <th>House Number</th>
-                        <th>Head of Household</th>
-                        <th>Residents</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="households-table-body">
-                    <tr><td colspan="6" class="text-center py-12"><i class="fas fa-spinner fa-spin text-4xl text-forest-600"></i></td></tr>
-                </tbody>
-            </table>
+            <!-- Desktop Table View -->
+            <div class="desktop-table-view overflow-x-auto custom-scrollbar">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Zone</th>
+                            <th>House Number</th>
+                            <th>Head of Household</th>
+                            <th>Residents</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="households-table-body">
+                        <tr><td colspan="6" class="text-center py-12"><i class="fas fa-spinner fa-spin text-4xl text-forest-600"></i></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Mobile Card View -->
+            <div class="mobile-card-view p-4" id="households-mobile-view">
+                <div class="text-center py-12">
+                    <i class="fas fa-spinner fa-spin text-4xl text-forest-600"></i>
+                </div>
+            </div>
         </div>
 
         <!-- Add Household Modal -->
@@ -137,9 +147,11 @@ function fetchHouseholdsData() {
 function renderHouseholds(data) {
     if (data.length === 0) {
         $('#households-table-body').html('<tr><td colspan="6" class="text-center py-8 text-earth-600">No households found</td></tr>');
+        $('#households-mobile-view').html('<div class="text-center py-8 text-earth-600">No households found</div>');
         return;
     }
 
+    // Desktop table view
     const rows = data.map(h => `
         <tr>
             <td class="font-semibold">Zone ${h.zone_num}</td>
@@ -156,6 +168,39 @@ function renderHouseholds(data) {
     `).join('');
 
     $('#households-table-body').html(rows);
+    
+    // Mobile card view
+    const cards = data.map(h => `
+        <div class="mobile-data-card">
+            <div class="card-row">
+                <span class="card-label">Zone</span>
+                <span class="card-value font-semibold">Zone ${h.zone_num}</span>
+            </div>
+            <div class="card-row">
+                <span class="card-label">House Number</span>
+                <span class="card-value">${h.house_num}</span>
+            </div>
+            <div class="card-row">
+                <span class="card-label">Head of Household</span>
+                <span class="card-value">${h.head_first_name && h.head_last_name ? `${h.head_first_name} ${h.head_last_name}` : 'Not assigned'}</span>
+            </div>
+            <div class="card-row">
+                <span class="card-label">Residents</span>
+                <span class="card-value"><span class="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">${h.resident_count || 0} residents</span></span>
+            </div>
+            <div class="card-row">
+                <span class="card-label">Status</span>
+                <span class="card-value"><span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">${displayHouseholdStatus(h.status)}</span></span>
+            </div>
+            <div class="card-actions">
+                <button onclick='editHousehold(${JSON.stringify(h).replace(/'/g, "&apos;")})' class="bg-gradient-to-r from-forest-600 to-forest-500 hover:from-forest-700 hover:to-forest-600 text-white px-4 py-2 rounded-lg w-full">
+                    <i class="fas fa-edit mr-2"></i>Edit
+                </button>
+            </div>
+        </div>
+    `).join('');
+    
+    $('#households-mobile-view').html(cards);
 }
 
 function filterHouseholds(searchTerm) {
@@ -189,8 +234,9 @@ function handleAddHousehold(e) {
             hideModal('add-household-modal');
             fetchHouseholdsData();
         },
-        error: function() {
-            alert('Error adding household');
+        error: function(xhr) {
+            const errorMsg = xhr.responseJSON?.error || 'Error adding household';
+            alert(errorMsg);
         }
     });
 }
@@ -225,8 +271,9 @@ function handleEditHousehold(e) {
             hideModal('edit-household-modal');
             fetchHouseholdsData();
         },
-        error: function() {
-            alert('Error updating household');
+        error: function(xhr) {
+            const errorMsg = xhr.responseJSON?.error || 'Error updating household';
+            alert(errorMsg);
         }
     });
 }
@@ -244,8 +291,9 @@ function deleteHousehold() {
             hideModal('edit-household-modal');
             fetchHouseholdsData();
         },
-        error: function() {
-            alert('Error deleting household');
+        error: function(xhr) {
+            const errorMsg = xhr.responseJSON?.error || 'Error deleting household';
+            alert(errorMsg);
         }
     });
 }

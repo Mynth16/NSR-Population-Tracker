@@ -3,6 +3,8 @@ require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/audit.php';
 
+header('Content-Type: application/json');
+
 $db = getDB();
 $method = $_SERVER['REQUEST_METHOD'];
 $pathInfo = $_SERVER['PATH_INFO'] ?? '';
@@ -72,6 +74,7 @@ if ($method === 'GET') {
 
 // POST /api/households - Create new household
 if ($method === 'POST' && empty($id)) {
+    Auth::requireEditor();
     $data = json_decode(file_get_contents('php://input'), true);
     
     $householdId = $db->generateUUID();
@@ -101,6 +104,7 @@ if ($method === 'POST' && empty($id)) {
 
 // PUT /api/households/{id} - Update household
 if ($method === 'PUT' && !empty($id)) {
+    Auth::requireEditor();
     $data = json_decode(file_get_contents('php://input'), true);
     $userId = Auth::getUserIdFromHeader();
     
@@ -142,6 +146,7 @@ if ($method === 'PUT' && !empty($id)) {
 
 // DELETE /api/households/{id} - Soft delete (archive) household
 if ($method === 'DELETE' && !empty($id)) {
+    Auth::requireEditor();
     $userId = Auth::getUserIdFromHeader();
     
     $household = $db->fetchOne("SELECT * FROM households WHERE household_id = ?", [$id]);

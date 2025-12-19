@@ -54,50 +54,50 @@ INSERT INTO households (zone_num, house_num, status, head_resident_id) VALUES
 
 -- Insert sample residents (let DB generate UUID, reference households by zone_num and house_num)
 -- Household 1 (Zone 1, House 001-A)
-INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email)
-SELECT household_id, 'Juan', 'Dela Cruz', '1975-05-15', 'M', 'M', 'High School Graduate', '09171234567', NULL
+INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email, registered_voter, pwd)
+SELECT household_id, 'Juan', 'Dela Cruz', '1975-05-15', 'M', 'M', 'High School Graduate', '09171234567', NULL, 'Y', 'N'
 FROM households WHERE zone_num = 1 AND house_num = '001-A';
 
-INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email)
-SELECT household_id, 'Maria', 'Dela Cruz', '1978-08-22', 'F', 'M', 'College Graduate', '09181234567', NULL
+INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email, registered_voter, pwd)
+SELECT household_id, 'Maria', 'Dela Cruz', '1978-08-22', 'F', 'M', 'College Graduate', '09181234567', NULL, 'Y', 'N'
 FROM households WHERE zone_num = 1 AND house_num = '001-A';
 
-INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email)
-SELECT household_id, 'Jose', 'Dela Cruz', '2005-03-10', 'M', 'S', 'High School Level', NULL, NULL
+INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email, registered_voter, pwd)
+SELECT household_id, 'Jose', 'Dela Cruz', '2005-03-10', 'M', 'S', 'High School Level', NULL, NULL, 'N', 'N'
 FROM households WHERE zone_num = 1 AND house_num = '001-A';
 
-INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email)
-SELECT household_id, 'Ana', 'Dela Cruz', '2008-11-28', 'F', 'S', 'Elementary Level', NULL, NULL
+INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email, registered_voter, pwd)
+SELECT household_id, 'Ana', 'Dela Cruz', '2008-11-28', 'F', 'S', 'Elementary Level', NULL, NULL, 'N', 'N'
 FROM households WHERE zone_num = 1 AND house_num = '001-A';
 
 -- Household 2 (Zone 1, House 002-B)
-INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email)
-SELECT household_id, 'Pedro', 'Santos', '1980-02-14', 'M', 'M', 'College Graduate', '09191234567', NULL
+INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email, registered_voter, pwd)
+SELECT household_id, 'Pedro', 'Santos', '1980-02-14', 'M', 'M', 'College Graduate', '09191234567', NULL, 'Y', 'N'
 FROM households WHERE zone_num = 1 AND house_num = '002-B';
 
-INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email)
-SELECT household_id, 'Rosa', 'Santos', '1982-07-19', 'F', 'M', 'High School Graduate', '09201234567', NULL
+INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email, registered_voter, pwd)
+SELECT household_id, 'Rosa', 'Santos', '1982-07-19', 'F', 'M', 'High School Graduate', '09201234567', NULL, 'Y', 'Y'
 FROM households WHERE zone_num = 1 AND house_num = '002-B';
 
-INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email)
-SELECT household_id, 'Miguel', 'Santos', '2010-09-05', 'M', 'S', 'Elementary Level', NULL, NULL
+INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email, registered_voter, pwd)
+SELECT household_id, 'Miguel', 'Santos', '2010-09-05', 'M', 'S', 'Elementary Level', NULL, NULL, 'N', 'N'
 FROM households WHERE zone_num = 1 AND house_num = '002-B';
 
 -- Household 3 (Zone 2, House 001-A)
-INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email)
-SELECT household_id, 'Antonio', 'Gonzales', '1970-12-25', 'M', 'M', 'Elementary Graduate', '09211234567', NULL
+INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email, registered_voter, pwd)
+SELECT household_id, 'Antonio', 'Gonzales', '1970-12-25', 'M', 'M', 'Elementary Graduate', '09211234567', NULL, 'Y', 'N'
 FROM households WHERE zone_num = 2 AND house_num = '001-A';
 
-INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email)
-SELECT household_id, 'Carmen', 'Gonzales', '1972-04-30', 'F', 'M', 'High School Graduate', '09221234567', NULL
+INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email, registered_voter, pwd)
+SELECT household_id, 'Carmen', 'Gonzales', '1972-04-30', 'F', 'M', 'High School Graduate', '09221234567', NULL, 'Y', 'N'
 FROM households WHERE zone_num = 2 AND house_num = '001-A';
 
-INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email)
-SELECT household_id, 'Roberto', 'Gonzales', '2000-06-15', 'M', 'S', 'College Level', '09231234567', NULL
+INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email, registered_voter, pwd)
+SELECT household_id, 'Roberto', 'Gonzales', '2000-06-15', 'M', 'S', 'College Level', '09231234567', NULL, 'Y', 'N'
 FROM households WHERE zone_num = 2 AND house_num = '001-A';
 
-INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email)
-SELECT household_id, 'Elena', 'Gonzales', '2003-01-20', 'F', 'S', 'High School Graduate', NULL, NULL
+INSERT INTO residents (household_id, first_name, last_name, birth_date, gender, civil_status, educational_attainment, contact_number, email, registered_voter, pwd)
+SELECT household_id, 'Elena', 'Gonzales', '2003-01-20', 'F', 'S', 'High School Graduate', NULL, NULL, 'Y', 'N'
 FROM households WHERE zone_num = 2 AND house_num = '001-A';
 
 -- Household 4 (Zone 2, House 002-C)

@@ -43,13 +43,17 @@ CREATE TABLE IF NOT EXISTS residents (
   educational_attainment VARCHAR(100),
   contact_number VARCHAR(20),
   email VARCHAR(100),
+  registered_voter ENUM('Y', 'N') DEFAULT 'N', -- Y=Yes, N=No
+  pwd ENUM('Y', 'N') DEFAULT 'N', -- Y=Yes (Person with Disability), N=No
   status ENUM('A', 'D', 'M', 'X') DEFAULT 'A', -- A=Active, D=Deceased, M=Moved, X=Archived
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (household_id) REFERENCES households(household_id) ON DELETE SET NULL,
   INDEX idx_household (household_id),
   INDEX idx_status (status),
-  INDEX idx_last_name (last_name)
+  INDEX idx_last_name (last_name),
+  INDEX idx_registered_voter (registered_voter),
+  INDEX idx_pwd (pwd)
 );
 
 -- Add foreign key constraint for head_resident_id after residents table is created
@@ -115,7 +119,9 @@ SELECT
   SUM(CASE WHEN gender = 'M' THEN 1 ELSE 0 END) as male_count,
   SUM(CASE WHEN gender = 'F' THEN 1 ELSE 0 END) as female_count,
   COUNT(DISTINCT household_id) as total_households,
-  AVG(TIMESTAMPDIFF(YEAR, birth_date, CURDATE())) as average_age
+  AVG(TIMESTAMPDIFF(YEAR, birth_date, CURDATE())) as average_age,
+  SUM(CASE WHEN registered_voter = 'Y' THEN 1 ELSE 0 END) as registered_voter_count,
+  SUM(CASE WHEN pwd = 'Y' THEN 1 ELSE 0 END) as pwd_count
 FROM residents
 WHERE status = 'A';
 

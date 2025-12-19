@@ -1,25 +1,32 @@
 # NSR Population Tracker
 
-A comprehensive population tracking and management system for Barangay New San Roque, built with PHP and MySQL.
+A comprehensive population tracking and management system for Barangay New San Roque, built with PHP and MySQL. Features a responsive design for mobile and desktop, with Docker support for easy deployment.
 
 ## 📋 Table of Contents
 
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
+  - [Using XAMPP (Local Development)](#using-xampp-recommended)
+  - [Using Docker (Deployment)](#using-docker)
 - [Database Setup](#database-setup)
 - [Running the Application](#running-the-application)
 - [Default Credentials](#default-credentials)
 - [Project Structure](#project-structure)
 - [Features](#features)
+- [Deployment](#deployment)
 - [Troubleshooting](#troubleshooting)
 
 ## 🔧 Prerequisites
 
-Before setting up this project, ensure you have the following installed:
-
+### For Local Development (XAMPP)
 - **PHP 7.4 or higher**
 - **MySQL 5.7+ or MariaDB 10.3+**
 - **XAMPP** (recommended for Windows)
+- **Git** (for cloning the repository)
+
+### For Docker Deployment
+- **Docker Desktop** (for Windows/Mac)
+- **Docker and Docker Compose** (for Linux)
 - **Git** (for cloning the repository)
 
 ## 📥 Installation
@@ -41,6 +48,27 @@ Before setting up this project, ensure you have the following installed:
    - Open XAMPP Control Panel
    - Start **Apache** (web server)
    - Start **MySQL** (database server)
+
+### Using Docker
+
+1. **Install Docker Desktop**
+   - Download from [https://www.docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop)
+   - Install and start Docker Desktop
+
+2. **Clone the Repository**
+   ```bash
+   git clone https://github.com/Mynth16/NSR-Population-Tracker.git
+   cd NSR-Population-Tracker
+   ```
+
+3. **Run with Docker Compose**
+   ```bash
+   docker-compose up -d
+   ```
+
+4. **Access the Application**
+   - Open browser to [http://localhost:8080](http://localhost:8080)
+   - The database is automatically set up with the schema
 
 ## 💾 Database Setup
 
@@ -90,13 +118,36 @@ mysql -u root -p nsr_population_tracker < backend/migrate-to-short-codes.sql
 
 ## 🚀 Running the Application
 
-### Using XAMPP (Recommended)
+### Using XAMPP
 
 1. Ensure Apache and MySQL are running in XAMPP Control Panel
 2. Open your browser and navigate to:
    - **Home Page:** [http://localhost/NSR-Population-Tracker/](http://localhost/NSR-Population-Tracker/)
    - **Login Page:** [http://localhost/NSR-Population-Tracker/login.php](http://localhost/NSR-Population-Tracker/login.php)
    - **Admin Dashboard:** [http://localhost/NSR-Population-Tracker/admin.php](http://localhost/NSR-Population-Tracker/admin.php)
+
+> 💡 **Quick Start:** Run `start-server.bat` for setup instructions and guidance.
+
+### Using Docker
+
+1. Start the application:
+   ```bash
+   docker-compose up -d
+   ```
+
+2. Access the application:
+   - **All Pages:** [http://localhost:8080](http://localhost:8080)
+   - Database is automatically available on port 3306
+
+3. View logs:
+   ```bash
+   docker-compose logs -f
+   ```
+
+4. Stop the application:
+   ```bash
+   docker-compose down
+   ```
 
 ### Verify Setup
 
@@ -148,6 +199,7 @@ NSR-Population-Tracker/
 │   ├── css/
 │   │   └── styles.css           # Custom styles
 │   └── js/                       # JavaScript files
+│       ├── accounts.js          # Account management
 │       ├── app.js               # Main application logic
 │       ├── audit.js             # Audit trail functionality
 │       ├── auth.js              # Authentication
@@ -162,6 +214,11 @@ NSR-Population-Tracker/
 ├── test-setup.php               # Setup verification
 ├── check-db.php                 # Database connection check
 ├── migrate-passwords.php        # Password migration utility
+├── start-server.bat             # XAMPP setup guide script
+├── deploy.bat                   # Docker Hub deployment script
+├── Dockerfile                   # Docker image configuration
+├── docker-compose.yml           # Docker Compose for local dev
+├── docker-compose.prod.yml      # Docker Compose for production
 └── README.md                    # This file
 ```
 
@@ -184,12 +241,14 @@ NSR-Population-Tracker/
 - Secure password hashing (bcrypt)
 - Session-based authentication
 - User account management
+- Account creation and deletion
 
 ### Audit Trail
 - Comprehensive activity logging
-- Track all CRUD operations
-- User action history
+- Track all CRUD operations (Create, Update, Delete)
+- User action history with filtering
 - Timestamp tracking
+- Record type and change type categorization
 
 ### Statistics & Reports
 - Population demographics
@@ -198,12 +257,60 @@ NSR-Population-Tracker/
 - Gender ratios
 - Real-time data visualization
 
+### Mobile Responsive Design
+- Fully responsive layout for mobile, tablet, and desktop
+- Mobile-optimized navigation with hamburger menu
+- Card-based mobile view for data tables
+- Touch-friendly interface
+- Adaptive forms and inputs for mobile devices
+
 ### Security Features
 - Password hashing with bcrypt
 - SQL injection prevention (PDO prepared statements)
 - XSS protection
 - CSRF token support
 - Session management
+
+## 🚢 Deployment
+
+### Docker Hub Deployment
+
+The project includes automated Docker deployment to Docker Hub:
+
+1. **Build and Push to Docker Hub**
+   ```bash
+   # Windows
+   deploy.bat
+   
+   # Linux/Mac
+   docker build -t gabcat/nsr-population-tracker:latest .
+   docker push gabcat/nsr-population-tracker:latest
+   ```
+
+2. **Pull and Run from Docker Hub**
+   ```bash
+   docker pull gabcat/nsr-population-tracker:latest
+   docker-compose -f docker-compose.prod.yml up -d
+   ```
+
+### Production Deployment
+
+For production environments:
+
+1. **Update Database Configuration**
+   - Edit `backend/config.php` with production database credentials
+   - Or use environment variables in Docker
+
+2. **Configure Environment**
+   - Set `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME` environment variables
+   - Update `docker-compose.prod.yml` with your database settings
+
+3. **Security Checklist**
+   - Change default admin password
+   - Enable HTTPS/SSL
+   - Update PHP settings in Dockerfile for production
+   - Configure proper file permissions
+   - Set up regular database backups
 
 ## 🔍 Troubleshooting
 
@@ -265,36 +372,36 @@ NSR-Population-Tracker/
   3. Ensure `.htaccess` is not blocking API requests
   4. Check that files exist in `backend/api/` folder
 
-## 📚 Additional Documentation
+### Docker Issues
 
-- [Password Hashing Implementation](PASSWORD_HASHING_IMPLEMENTATION.md) - Details on secure password handling
-- [PHP Migration Guide](PHP_MIGRATION_GUIDE.md) - Migration from older PHP versions
-- [Quick Start Guide](QUICKSTART_PHP.md) - Fast setup instructions
+#### Container Won't Start
+- **Problem:** Docker container fails to start
+- **Solution:**
+  1. Check Docker Desktop is running
+  2. Run `docker-compose logs` to see error messages
+  3. Ensure ports 8080 and 3306 are not in use
+  4. Try `docker-compose down` then `docker-compose up -d`
 
-## 🛡️ Security Considerations
+#### Database Connection Failed in Docker
+- **Problem:** Application can't connect to database in Docker
+- **Solution:**
+  1. Verify `backend/config.php` uses `DB_HOST='db'` for Docker
+  2. Check `docker-compose.yml` database credentials
+  3. Wait a few seconds after starting for MySQL to initialize
+  4. Run `docker-compose restart`
 
-For production deployment, ensure:
+#### Port Conflicts
+- **Problem:** Port 8080 or 3306 already in use
+- **Solution:**
+  1. Edit `docker-compose.yml` to use different ports
+  2. Change `"8080:80"` to `"8081:80"` for web
+  3. Change `"3306:3306"` to `"3307:3306"` for database
 
-- ✅ Change all default passwords
-- ✅ Enable HTTPS/SSL certificates
-- ✅ Keep PHP and MySQL updated
-- ✅ Disable `display_errors` in `php.ini`
-- ✅ Set proper file permissions
-- ✅ Implement regular database backups
-- ✅ Use environment variables for sensitive config
-- ✅ Enable CSRF protection
-- ✅ Implement rate limiting for login attempts
 
-## 🤝 Contributing
+### Utility Scripts
 
-This is a barangay-specific project for Barangay New San Roque. For suggestions or issues, please contact the development team.
-
-## 📝 License
-
-This project is developed for Barangay New San Roque population management.
-
----
-
-**Version:** 1.0  
-**Last Updated:** December 2025  
-**Maintainer:** Barangay New San Roque IT Team
+- `start-server.bat` - Display setup instructions and guidance for XAMPP
+- `deploy.bat` - Build and push Docker image to Docker Hub
+- `migrate-passwords.php` - Migrate passwords to bcrypt hashing
+- `test-setup.php` - Verify PHP configuration and setup
+- `check-db.php` - Test database connectivity

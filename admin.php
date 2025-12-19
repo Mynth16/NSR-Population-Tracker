@@ -47,10 +47,23 @@ Auth::startSession();
 </head>
 <body class="bg-earth-50">
     
+    <!-- Mobile Menu Button -->
+    <button id="mobile-menu-btn" class="fixed z-50 p-3 text-white rounded-lg shadow-lg top-4 left-4 bg-forest-900 lg:hidden">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Mobile Overlay -->
+    <div id="sidebar-overlay" class="fixed inset-0 z-40 hidden bg-black bg-opacity-50 lg:hidden"></div>
+    
     <div class="flex min-h-screen">
         <!-- Sidebar -->
-        <aside class="fixed w-64 h-full text-white admin-sidebar">
+        <aside id="admin-sidebar" class="fixed z-50 w-64 h-full text-white transition-transform duration-300 transform -translate-x-full admin-sidebar lg:translate-x-0">
             <div class="p-6">
+                <!-- Close Button (Mobile Only) -->
+                <button id="close-sidebar-btn" class="absolute text-white top-4 right-4 lg:hidden hover:text-forest-300">
+                    <i class="text-xl fas fa-times"></i>
+                </button>
+                
                 <div class="flex items-center mb-8">
                     <img src="images/NSRLogo.png" alt="Logo" class="w-12 h-12 mr-3">
                     <div>
@@ -103,7 +116,7 @@ Auth::startSession();
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 p-8 ml-64">
+        <main class="flex-1 p-4 pt-20 lg:ml-64 lg:p-8 lg:pt-8">
             <div id="page-content">
                 <!-- Content will be loaded here dynamically -->
             </div>

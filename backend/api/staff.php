@@ -3,6 +3,8 @@ require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/audit.php';
 
+header('Content-Type: application/json');
+
 $db = getDB();
 $method = $_SERVER['REQUEST_METHOD'];
 $pathInfo = $_SERVER['PATH_INFO'] ?? '';
@@ -31,6 +33,7 @@ if ($method === 'GET') {
 
 // POST /api/staff - Create new staff member
 if ($method === 'POST' && empty($id)) {
+    Auth::requireEditor();
     $data = json_decode(file_get_contents('php://input'), true);
     
     $staffId = $db->generateUUID();
@@ -60,6 +63,7 @@ if ($method === 'POST' && empty($id)) {
 
 // PUT /api/staff/{id} - Update staff member
 if ($method === 'PUT' && !empty($id)) {
+    Auth::requireEditor();
     $data = json_decode(file_get_contents('php://input'), true);
     $userId = Auth::getUserIdFromHeader();
     
@@ -99,6 +103,7 @@ if ($method === 'PUT' && !empty($id)) {
 
 // DELETE /api/staff/{id} - Hard delete staff member
 if ($method === 'DELETE' && !empty($id)) {
+    Auth::requireEditor();
     $userId = Auth::getUserIdFromHeader();
     
     $staff = $db->fetchOne("SELECT * FROM staff WHERE staff_id = ?", [$id]);

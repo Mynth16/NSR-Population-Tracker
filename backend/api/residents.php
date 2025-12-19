@@ -3,6 +3,8 @@ require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/audit.php';
 
+header('Content-Type: application/json');
+
 $db = getDB();
 $method = $_SERVER['REQUEST_METHOD'];
 $pathInfo = $_SERVER['PATH_INFO'] ?? '';
@@ -58,14 +60,16 @@ if ($method === 'GET') {
 
 // POST /api/residents - Create new resident
 if ($method === 'POST' && empty($id)) {
+    Auth::requireEditor();
     $data = json_decode(file_get_contents('php://input'), true);
     
     $residentId = $db->generateUUID();
     $userId = Auth::getUserIdFromHeader();
     
     $sql = "INSERT INTO residents (resident_id, household_id, first_name, last_name, birth_date, 
-            gender, civil_status, educational_attainment, contact_number, email, status) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'A')";
+            gender, civil_status, educational_attainment, contact_number, email, 
+            registered_voter, pwd, status) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'A')";
     
     $db->execute($sql, [
         $residentId,
@@ -77,7 +81,9 @@ if ($method === 'POST' && empty($id)) {
         $data['civil_status'],
         $data['educational_attainment'] ?? null,
         $data['contact_number'] ?? null,
-        $data['email'] ?? null
+        $data['email'] ?? null,
+        $data['registered_voter'] ?? 'N',
+        $data['pwd'] ?? 'N'
     ]);
     
     // Log audit trail
@@ -99,6 +105,7 @@ if ($method === 'POST' && empty($id)) {
 
 // PUT /api/residents/{id} - Update resident
 if ($method === 'PUT' && !empty($id)) {
+    Auth::requireEditor();
     $data = json_decode(file_get_contents('php://input'), true);
     $userId = Auth::getUserIdFromHeader();
     
@@ -114,7 +121,7 @@ if ($method === 'PUT' && !empty($id)) {
     $sql = "UPDATE residents SET 
             household_id = ?, first_name = ?, last_name = ?, birth_date = ?, 
             gender = ?, civil_status = ?, educational_attainment = ?, 
-            contact_number = ?, email = ?, status = ? 
+            contact_number = ?, email = ?, registered_voter = ?, pwd = ?, status = ? 
             WHERE resident_id = ?";
     
     $db->execute($sql, [
@@ -127,13 +134,15 @@ if ($method === 'PUT' && !empty($id)) {
         $data['educational_attainment'] ?? null,
         $data['contact_number'] ?? null,
         $data['email'] ?? null,
+        $data['registered_voter'] ?? 'N',
+        $data['pwd'] ?? 'N',
         $data['status'] ?? 'A',
         $id
     ]);
     
     // Track changes for audit
     $fields = ['household_id', 'first_name', 'last_name', 'birth_date', 'gender', 'civil_status', 
-               'educational_attainment', 'contact_number', 'email', 'status'];
+               'educational_attainment', 'contact_number', 'email', 'registered_voter', 'pwd', 'status'];
     $changes = AuditTrail::getChangedFields($oldData, $data, $fields);
     
     if (!empty($changes)) {
@@ -154,6 +163,7 @@ if ($method === 'PUT' && !empty($id)) {
 
 // DELETE /api/residents/{id} - Soft delete (archive) resident
 if ($method === 'DELETE' && !empty($id)) {
+    Auth::requireEditor();
     $userId = Auth::getUserIdFromHeader();
     
     $resident = $db->fetchOne("SELECT * FROM residents WHERE resident_id = ?", [$id]);
