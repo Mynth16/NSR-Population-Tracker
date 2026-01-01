@@ -33,6 +33,23 @@ if ($method === 'GET') {
 
 // POST /api/accounts - Create new account
 if ($method === 'POST' && empty($id)) {
+    $user = Auth::getCurrentUser();
+    if (!$user) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Unauthorized']);
+        exit();
+    }
+    if ($user['role'] === 'S') {
+        http_response_code(403);
+        echo json_encode(['error' => 'Staff accounts are not allowed to add accounts.']);
+        exit();
+    }
+    if ($user['role'] === 'V') {
+        http_response_code(403);
+        echo json_encode(['error' => 'Viewer accounts are not allowed to perform any actions.']);
+        exit();
+    }
+    // Only admins can proceed
     Auth::requireAdmin();
     $data = json_decode(file_get_contents('php://input'), true);
     
@@ -105,6 +122,23 @@ if ($method === 'POST' && empty($id)) {
 
 // PUT /api/accounts/{id} - Update account
 if ($method === 'PUT' && !empty($id)) {
+    $user = Auth::getCurrentUser();
+    if (!$user) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Unauthorized']);
+        exit();
+    }
+    if ($user['role'] === 'S') {
+        http_response_code(403);
+        echo json_encode(['error' => 'Staff accounts are not allowed to edit accounts.']);
+        exit();
+    }
+    if ($user['role'] === 'V') {
+        http_response_code(403);
+        echo json_encode(['error' => 'Viewer accounts are not allowed to perform any actions.']);
+        exit();
+    }
+    // Only admins can proceed
     Auth::requireAdmin();
     $data = json_decode(file_get_contents('php://input'), true);
     $userId = Auth::getUserIdFromHeader();
@@ -174,6 +208,23 @@ if ($method === 'PUT' && !empty($id)) {
 
 // DELETE /api/accounts/{id} - Hard delete account
 if ($method === 'DELETE' && !empty($id)) {
+    $user = Auth::getCurrentUser();
+    if (!$user) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Unauthorized']);
+        exit();
+    }
+    if ($user['role'] === 'S') {
+        http_response_code(403);
+        echo json_encode(['error' => 'Staff accounts are not allowed to delete accounts.']);
+        exit();
+    }
+    if ($user['role'] === 'V') {
+        http_response_code(403);
+        echo json_encode(['error' => 'Viewer accounts are not allowed to perform any actions.']);
+        exit();
+    }
+    // Only admins can proceed
     Auth::requireAdmin();
     $userId = Auth::getUserIdFromHeader();
     

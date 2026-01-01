@@ -60,7 +60,24 @@ if ($method === 'GET') {
 
 // POST /api/residents - Create new resident
 if ($method === 'POST' && empty($id)) {
-    Auth::requireEditor();
+    $user = Auth::getCurrentUser();
+    if (!$user) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Unauthorized']);
+        exit();
+    }
+    if ($user['role'] === 'S') {
+        http_response_code(403);
+        echo json_encode(['error' => 'Staff accounts are not allowed to add/edit/delete residents.']);
+        exit();
+    }
+    if ($user['role'] === 'V') {
+        http_response_code(403);
+        echo json_encode(['error' => 'Viewer accounts are not allowed to perform any actions.']);
+        exit();
+    }
+    // Only admins can proceed
+    Auth::requireAdmin();
     $data = json_decode(file_get_contents('php://input'), true);
     
     $residentId = $db->generateUUID();
