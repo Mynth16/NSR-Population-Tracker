@@ -5,7 +5,6 @@ USE nsr_population_tracker;
 /*
  * OPTIMIZED ENUM VALUES REFERENCE
  * Database fields use short codes for space efficiency
- * Display mapping is handled in application layer (see backend/includes/db.php and assets/js/app.js)
  * 
  * GENDER: M=Male, F=Female
  * CIVIL_STATUS: S=Single, M=Married, W=Widowed, SEP=Separated, D=Divorced
